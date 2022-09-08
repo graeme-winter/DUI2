@@ -1,9 +1,9 @@
-#from multiprocessing import Process
+# from multiprocessing import Process
 from client import run_client
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     par_def = (
-        ("url", 'http://localhost:45678/'),
+        ("url", "http://localhost:45678/"),
         ("all_local", "false"),
         ("windows_exe", "false"),
     )
@@ -11,4 +11,3 @@ if __name__ == '__main__':
     run_client.main(par_def)
 
     print("Closing client naturally")
-
