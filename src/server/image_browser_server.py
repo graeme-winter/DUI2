@@ -32,6 +32,7 @@ from dxtbx.model.experiment_list import ExperimentListFactory
 
 from shared_modules import format_utils
 
+
 class Browser(object):
     def __init__(self, tree_dic_lst):
         self._dir_tree_dict = tree_dic_lst
@@ -46,21 +47,21 @@ class Browser(object):
         if uni_cmd == "dir_tree":
             print("\n *** dir_tree *** \n")
             str_dir_tree = json.dumps(self._dir_tree_dict)
-            byt_data = bytes(str_dir_tree.encode('utf-8'))
+            byt_data = bytes(str_dir_tree.encode("utf-8"))
             return_list = byt_data
 
         elif uni_cmd == "gis":
             img_num = int(cmd_lst[1])
             print("generating slice of image", img_num)
-            '''
+            """
             cmd_lst = ['gis', '0', 'inv_scale=1', 'view_rect=319,463,693,1089']
 
-            '''
+            """
             inv_scale = 1
             for sub_par in cmd_lst[2:]:
                 eq_pos = sub_par.find("=")
                 left_side = sub_par[0:eq_pos]
-                right_side = sub_par[eq_pos + 1:]
+                right_side = sub_par[eq_pos + 1 :]
                 if left_side == "inv_scale":
                     inv_scale = int(right_side)
                     print("inv_scale =", inv_scale)
@@ -75,7 +76,7 @@ class Browser(object):
                 [exp_path], img_num, inv_scale, x1, y1, x2, y2
             )
             if str_json is not None:
-                byt_data = bytes(str_json.encode('utf-8'))
+                byt_data = bytes(str_json.encode("utf-8"))
                 return_list = byt_data
 
         elif uni_cmd == "gmis":
@@ -86,7 +87,7 @@ class Browser(object):
             for sub_par in cmd_lst[2:]:
                 eq_pos = sub_par.find("=")
                 left_side = sub_par[0:eq_pos]
-                right_side = sub_par[eq_pos + 1:]
+                right_side = sub_par[eq_pos + 1 :]
                 if left_side == "inv_scale":
                     inv_scale = int(right_side)
                     print("inv_scale =", inv_scale)
@@ -101,7 +102,7 @@ class Browser(object):
                 [exp_path], img_num, inv_scale, x1, y1, x2, y2
             )
             if str_json is not None:
-                byt_data = bytes(str_json.encode('utf-8'))
+                byt_data = bytes(str_json.encode("utf-8"))
                 return_list = byt_data
 
         elif uni_cmd == "gi":
@@ -109,11 +110,12 @@ class Browser(object):
             print("generating image", img_num)
             exp_path = cmd_dict["path"][0]
             str_json = flex_arr_2_json.get_json_w_img_2d(
-                [exp_path], img_num,
+                [exp_path],
+                img_num,
             )
 
             if str_json is not None:
-                byt_data = bytes(str_json.encode('utf-8'))
+                byt_data = bytes(str_json.encode("utf-8"))
                 return_list = byt_data
 
         elif uni_cmd == "gmi":
@@ -121,18 +123,17 @@ class Browser(object):
             print("generating slice of mask image", img_num)
             exp_path = cmd_dict["path"][0]
             str_json = flex_arr_2_json.get_json_w_mask_img_2d(
-                [exp_path], img_num,
+                [exp_path],
+                img_num,
             )
             if str_json is not None:
-                byt_data = bytes(str_json.encode('utf-8'))
+                byt_data = bytes(str_json.encode("utf-8"))
                 return_list = byt_data
 
         elif uni_cmd == "get_template":
             exp_path = cmd_dict["path"][0]
             img_num = int(cmd_lst[1])
-            return_list = flex_arr_2_json.get_template_info(
-                exp_path, img_num
-            )
+            return_list = flex_arr_2_json.get_template_info(exp_path, img_num)
 
         elif uni_cmd == "get_reflection_list":
             print("cmd_dict =", cmd_dict)
@@ -141,16 +142,14 @@ class Browser(object):
             ref_path = exp_path[:-4] + "refl"
             print("\n ref_path =", ref_path, "\n")
             refl_lst = flex_arr_2_json.get_refl_lst(
-                [exp_path], [ref_path],
-                int(cmd_lst[1])
+                [exp_path], [ref_path], int(cmd_lst[1])
             )
             return_list = refl_lst
 
         return return_list
 
 
-
-def main(par_def = None, connection_out = None):
+def main(par_def=None, connection_out=None):
     class ReqHandler(http.server.BaseHTTPRequestHandler):
         def do_GET(self):
             self.send_response(200)
@@ -160,43 +159,41 @@ def main(par_def = None, connection_out = None):
             cmd_dict = url_dict
 
             try:
-                #lst_out = []
+                # lst_out = []
                 lst_out = browser_runner.run_get_data(cmd_dict)
 
                 if type(lst_out) is list or type(lst_out) is dict:
-                    self.send_header('Content-type', 'text/plain')
+                    self.send_header("Content-type", "text/plain")
                     self.end_headers()
-                    json_str = json.dumps(lst_out) + '\n'
-                    self.wfile.write(bytes(json_str, 'utf-8'))
+                    json_str = json.dumps(lst_out) + "\n"
+                    self.wfile.write(bytes(json_str, "utf-8"))
 
                 elif type(lst_out) is bytes:
                     byt_data = zlib.compress(lst_out)
                     siz_dat = str(len(byt_data))
                     print("size =", siz_dat)
 
-                    self.send_header('Content-type', 'application/zlib')
-                    self.send_header('Content-Length', siz_dat)
+                    self.send_header("Content-type", "application/zlib")
+                    self.send_header("Content-Length", siz_dat)
                     self.end_headers()
 
                     self.wfile.write(bytes(byt_data))
 
                 print("sending /*EOF*/")
-                self.wfile.write(bytes('/*EOF*/', 'utf-8'))
+                self.wfile.write(bytes("/*EOF*/", "utf-8"))
 
             except BrokenPipeError:
                 print("\n << BrokenPipe err catch >>  while sending EOF or JSON \n")
 
             except ConnectionResetError:
-                print(
-                    "\n << ConnectionReset err catch >> while sending EOF or JSON\n"
-                )
+                print("\n << ConnectionReset err catch >> while sending EOF or JSON\n")
 
     ################################################ PROPER MAIN BROWSER
 
     par_def = (
         ("port", 45678),
         ("host", "localhost"),
-        #("host", "serverip"),
+        # ("host", "serverip"),
         ("init_path", "."),
         ("all_local", "False"),
     )
@@ -207,7 +204,7 @@ def main(par_def = None, connection_out = None):
     PORT = int(init_param["port"])
     HOST = init_param["host"]
 
-    #global run_local
+    # global run_local
     if init_param["all_local"].lower() == "true":
         run_local = True
 
@@ -219,12 +216,9 @@ def main(par_def = None, connection_out = None):
     tree_ini_path = init_param["init_path"]
     if tree_ini_path == None:
         print("\n NOT GIVEN init path, using << HOME env >>")
-        tree_ini_path = os.environ['HOME']
+        tree_ini_path = os.environ["HOME"]
 
-    print(
-        "\n * using init path as: ",
-        tree_ini_path, " * \n"
-    )
+    print("\n * using init path as: ", tree_ini_path, " * \n")
     tree_dic_lst = iter_dict(tree_ini_path, 0)
 
     #####################################################
@@ -248,6 +242,5 @@ def main(par_def = None, connection_out = None):
         except OSError:
             launch_success = False
 
-            print("OS err catch , trying again in",  n_secs, "secs")
+            print("OS err catch , trying again in", n_secs, "secs")
             time.sleep(n_secs)
-

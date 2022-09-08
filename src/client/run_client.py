@@ -31,6 +31,7 @@ from client.q_object import MainObject
 from client.init_firts import ini_data
 from client.exec_utils import json_data_request
 
+
 def create_tmp_dir():
     path2add = os.getcwd() + os.sep + "run_dui_tmp"
     try:
@@ -43,7 +44,7 @@ def create_tmp_dir():
     return path2add
 
 
-def main(par_def = None):
+def main(par_def=None):
     data_init = ini_data()
     data_init.set_data(par_def)
     uni_url = data_init.get_url()
@@ -53,9 +54,9 @@ def main(par_def = None):
 
     data_init.set_tmp_dir(tmp_dat_dir)
 
-    print('get_if_local =', data_init.get_if_local(), 'get_url =', uni_url)
+    print("get_if_local =", data_init.get_if_local(), "get_url =", uni_url)
 
-    cmd = {"nod_lst":[""], "cmd_lst":["display"]}
+    cmd = {"nod_lst": [""], "cmd_lst": ["display"]}
     dummy_nod_lst = None
     n_secs = 3
     print("here 1")
@@ -70,8 +71,7 @@ def main(par_def = None):
             print("dummy_nod_lst != None ...\n launching GUI")
 
     app = QApplication(sys.argv)
-    m_obj = MainObject(parent = app)
+    m_obj = MainObject(parent=app)
     print("before sys.exit")
     sys.exit(app.exec_())
     print("after sys.exit")
-

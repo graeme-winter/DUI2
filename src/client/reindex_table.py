@@ -28,8 +28,10 @@ import os
 
 from PySide2.QtCore import *
 from PySide2.QtWidgets import *
-#from PySide2 import QtUiTools
+
+# from PySide2 import QtUiTools
 from PySide2.QtGui import *
+
 
 def choice_if_decimal(num_in):
 
@@ -42,15 +44,16 @@ def choice_if_decimal(num_in):
 
     return str_out
 
-def ops_list_from_json(json_data = None):
+
+def ops_list_from_json(json_data=None):
     if json_data is None:
         return None
 
     lst_ops = []
     for key, value in json_data.items():
         recommended_str = "  "
-        #print("outer key:", key)
-        #print("outer dict:", value)
+        # print("outer key:", key)
+        # print("outer dict:", value)
         for inner_key in value:
             if inner_key == "rmsd":
                 rmsd_val = value["rmsd"]
@@ -117,7 +120,7 @@ def ops_list_from_json(json_data = None):
                     recommended_str = " N"
 
             else:
-                #print("Fell off end of key list with inner_key=", inner_key)
+                # print("Fell off end of key list with inner_key=", inner_key)
                 pass
 
         single_lin_lst = [
@@ -145,7 +148,7 @@ def ops_list_from_json(json_data = None):
 class ReindexTable(QTableWidget):
     opt_signal = Signal(int)
 
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(ReindexTable, self).__init__(parent)
 
         self.cellClicked.connect(self.opt_clicked)
@@ -153,7 +156,7 @@ class ReindexTable(QTableWidget):
         self.v_sliderBar = self.verticalScrollBar()
         self.h_sliderBar = self.horizontalScrollBar()
 
-        #self.tmp_sel = None
+        # self.tmp_sel = None
 
         sys_font = QFont()
         self.sys_font_point_size = sys_font.pointSize()
@@ -176,10 +179,10 @@ class ReindexTable(QTableWidget):
         self.opt_pick(self.tmp_sel)
 
     def opt_pick(self, row):
-        '''
+        """
         if self.tmp_sel == row:
             print("\n selecting opt: ", row + 1, "\n")
-        '''
+        """
         self.opt_signal.emit(row + 1)
 
         self.tmp_sel = row
@@ -195,9 +198,7 @@ class ReindexTable(QTableWidget):
 
         return bst_sol
 
-    def add_opts_lst(
-        self, lst_labels = None, json_data = None, selected_pos = None
-    ):
+    def add_opts_lst(self, lst_labels=None, json_data=None, selected_pos=None):
 
         if lst_labels is None:
             self.list_labl = ops_list_from_json(json_data)
@@ -210,11 +211,11 @@ class ReindexTable(QTableWidget):
         self.setRowCount(n_row)
         self.setColumnCount(n_col - 1)
 
-        alpha_str = " " + u"\u03B1" + " "
-        beta_str = " " + u"\u03B2" + " "
-        gamma_str = " " + u"\u03B3" + " "
+        alpha_str = " " + "\u03B1" + " "
+        beta_str = " " + "\u03B2" + " "
+        gamma_str = " " + "\u03B3" + " "
 
-        low_delta_str = u"\u03B4"
+        low_delta_str = "\u03B4"
         delta_max_str = "max " + low_delta_str
 
         header_label_lst = [
@@ -284,34 +285,34 @@ class ReindexTable(QTableWidget):
         self.setRowCount(1)
         self.setColumnCount(1)
 
+
 def get_label_from_str_list(log_data):
 
-        for num, single_line in enumerate(log_data):
-            if single_line[:6] == "Chiral":
-                ini_num = num
+    for num, single_line in enumerate(log_data):
+        if single_line[:6] == "Chiral":
+            ini_num = num
 
-            if single_line[:6] == "+-----":
-                end_num = num
-                break
+        if single_line[:6] == "+-----":
+            end_num = num
+            break
 
-        print("ini_num =", ini_num)
-        print("end_num =", end_num)
+    print("ini_num =", ini_num)
+    print("end_num =", end_num)
 
-        lst_str = log_data[ini_num:end_num]
-        full_label_str = ""
-        for label_line in lst_str:
-            full_label_str += label_line
+    lst_str = log_data[ini_num:end_num]
+    full_label_str = ""
+    for label_line in lst_str:
+        full_label_str += label_line
 
-
-        return full_label_str
+    return full_label_str
 
 
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
 
-        #full_json_path = "/home/lui-temp/xrd_data/tst_area/run4/bravais_summary.json"
-        #full_log_path = "/home/lui-temp/xrd_data/tst_area/run4/out.log"
+        # full_json_path = "/home/lui-temp/xrd_data/tst_area/run4/bravais_summary.json"
+        # full_log_path = "/home/lui-temp/xrd_data/tst_area/run4/out.log"
 
         full_json_path = "/tmp/run6/bravais_summary.json"
         full_log_path = "/tmp/run6/out.log"
@@ -326,7 +327,7 @@ class MainWindow(QMainWindow):
         full_label_str = get_label_from_str_list(log_data)
 
         my_inner_table = ReindexTable()
-        my_inner_table.add_opts_lst(json_data = json_data)
+        my_inner_table.add_opts_lst(json_data=json_data)
 
         vbox = QVBoxLayout()
         vbox.addWidget(QLabel(full_label_str))
@@ -343,7 +344,3 @@ if __name__ == "__main__":
     myWidget = MainWindow()
     myWidget.show()
     app.exec_()
-
-
-
-

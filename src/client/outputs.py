@@ -32,33 +32,30 @@ from client.init_firts import ini_data
 
 import subprocess, psutil
 
+
 class LoadFiles(QThread):
     files_loaded = Signal(dict)
     loading_failed = Signal()
     progressing = Signal(int)
-    def __init__(
-        self, unit_URL = None, cur_nod_num = None, tmp_dir = None
-    ):
+
+    def __init__(self, unit_URL=None, cur_nod_num=None, tmp_dir=None):
         super(LoadFiles, self).__init__()
         self.uni_url = unit_URL
         self.cur_nod_num = cur_nod_num
         self.files_path_n_nod_num = {
-            "tmp_exp_path"  :tmp_dir + os.sep + "req_file.expt",
-            "tmp_ref_path"  :tmp_dir + os.sep + "req_file.refl",
-            "cur_nod_num"   :int(cur_nod_num)
+            "tmp_exp_path": tmp_dir + os.sep + "req_file.expt",
+            "tmp_ref_path": tmp_dir + os.sep + "req_file.refl",
+            "cur_nod_num": int(cur_nod_num),
         }
 
     def run(self):
         print("launching << get_experiments_file >> for node: ", self.cur_nod_num)
-        my_cmd = {"nod_lst" : [self.cur_nod_num],
-                  "cmd_lst" : ["get_experiments_file"]}
+        my_cmd = {"nod_lst": [self.cur_nod_num], "cmd_lst": ["get_experiments_file"]}
 
-        self.req = requests.get(
-            self.uni_url, stream = True, params = my_cmd
-        )
+        self.req = requests.get(self.uni_url, stream=True, params=my_cmd)
         exp_compresed = self.req.content
         try:
-            full_exp_file = zlib.decompress(exp_compresed).decode('utf-8')
+            full_exp_file = zlib.decompress(exp_compresed).decode("utf-8")
             tmp_file = open(self.files_path_n_nod_num["tmp_exp_path"], "w")
             tmp_file.write(full_exp_file)
             tmp_file.close()
@@ -70,11 +67,10 @@ class LoadFiles(QThread):
             return
 
         print("launching << get_reflections_file >> for node: ", self.cur_nod_num)
-        my_cmd = {"nod_lst" : [self.cur_nod_num],
-                  "cmd_lst" : ["get_reflections_file"]}
+        my_cmd = {"nod_lst": [self.cur_nod_num], "cmd_lst": ["get_reflections_file"]}
 
-        self.req = requests.get(self.uni_url, stream=True, params = my_cmd)
-        total_size = int(self.req.headers.get('content-length', 0)) + 1
+        self.req = requests.get(self.uni_url, stream=True, params=my_cmd)
+        total_size = int(self.req.headers.get("content-length", 0)) + 1
         print("total_size =", total_size)
         block_size = int(total_size / 16)
         downloaded_size = 0
@@ -115,7 +111,8 @@ class LaunchReciprocalLattice(QThread):
     def run(self):
         cmd_lst = [
             "dials.reciprocal_lattice_viewer",
-            self.exp_path, self.ref_path,
+            self.exp_path,
+            self.ref_path,
         ]
         try:
             print("\n\n win_exe =", self.win_exe)
@@ -124,22 +121,20 @@ class LaunchReciprocalLattice(QThread):
 
             print("\n Running:", cmd_lst, "\n")
             self.my_proc = subprocess.Popen(
-                cmd_lst, shell = False,
-                stdout = subprocess.PIPE,
-                stderr = subprocess.STDOUT,
-                universal_newlines = True
+                cmd_lst,
+                shell=False,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                universal_newlines=True,
             )
 
         except FileNotFoundError:
-            print(
-                "unable to run:", cmd_lst,
-                " <<FileNotFound err catch >> "
-            )
+            print("unable to run:", cmd_lst, " <<FileNotFound err catch >> ")
             self.my_proc = None
             return
 
         new_line = None
-        while self.my_proc.poll() is None or new_line != '':
+        while self.my_proc.poll() is None or new_line != "":
             new_line = self.my_proc.stdout.readline()
             if len(new_line) > 1:
                 print(new_line)
@@ -177,7 +172,8 @@ class LaunchReciprocalLattice(QThread):
 
 class HandleReciprocalLatticeView(QObject):
     get_nod_num = Signal(int)
-    def __init__(self, parent = None):
+
+    def __init__(self, parent=None):
         super(HandleReciprocalLatticeView, self).__init__(parent)
         self.main_obj = parent
         print("HandleReciprocalLatticeView(__init__)")
@@ -193,8 +189,7 @@ class HandleReciprocalLatticeView(QObject):
         print("Launching Reciprocal Lattice View for node: ", nod_num)
         self.quit_kill_all()
         self.load_thread = LoadFiles(
-            unit_URL = self.uni_url, cur_nod_num = nod_num,
-            tmp_dir = self.tmp_dir
+            unit_URL=self.uni_url, cur_nod_num=nod_num, tmp_dir=self.tmp_dir
         )
         self.load_thread.files_loaded.connect(self.new_files)
         self.load_thread.loading_failed.connect(self.failed_loading)
@@ -216,8 +211,7 @@ class HandleReciprocalLatticeView(QObject):
 
     def do_launch_RL(self):
         self.launch_RL_thread = LaunchReciprocalLattice(
-            self.paths_n_nod_num["tmp_exp_path"],
-            self.paths_n_nod_num["tmp_ref_path"]
+            self.paths_n_nod_num["tmp_exp_path"], self.paths_n_nod_num["tmp_ref_path"]
         )
         self.launch_RL_thread.finished.connect(self.ended)
         self.launch_RL_thread.start()
@@ -262,7 +256,7 @@ class HandleReciprocalLatticeView(QObject):
 
 
 class HandleLoadStatusLabel(QObject):
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(HandleLoadStatusLabel, self).__init__(parent)
         self.main_obj = parent
 
@@ -270,7 +264,7 @@ class HandleLoadStatusLabel(QObject):
         self.main_obj.window.OutuputStatLabel.setStyleSheet(
             "QLabel { background-color : green; color : yellow; }"
         )
-        self.main_obj.window.OutuputStatLabel.setText('  Loading  ')
+        self.main_obj.window.OutuputStatLabel.setText("  Loading  ")
         self.main_obj.parent_app.processEvents()
         print("load_started (HandleLoadStatusLabel)")
 
@@ -290,7 +284,7 @@ class HandleLoadStatusLabel(QObject):
             "QLabel { background-color : green; color : yellow; }"
         )
         self.main_obj.window.OutuputStatLabel.setText(
-            '  Loading: ' + str_progress + " %  "
+            "  Loading: " + str_progress + " %  "
         )
         self.main_obj.parent_app.processEvents()
 
@@ -298,13 +292,13 @@ class HandleLoadStatusLabel(QObject):
         self.main_obj.window.OutuputStatLabel.setStyleSheet(
             "QLabel { background-color : white; color : blue; }"
         )
-        self.main_obj.window.OutuputStatLabel.setText('  Ready  ')
+        self.main_obj.window.OutuputStatLabel.setText("  Ready  ")
         self.main_obj.parent_app.processEvents()
         print("load_finished (HandleLoadStatusLabel)")
 
 
 class DoLoadHTML(QObject):
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(DoLoadHTML, self).__init__(parent)
         self.main_obj = parent
 
@@ -314,15 +308,9 @@ class DoLoadHTML(QObject):
 
         self.l_stat = HandleLoadStatusLabel(self.main_obj)
 
-        self.main_obj.window.HtmlReport.loadStarted.connect(
-            self.l_stat.load_started
-        )
-        self.main_obj.window.HtmlReport.loadProgress.connect(
-            self.l_stat.load_progress
-        )
-        self.main_obj.window.HtmlReport.loadFinished.connect(
-            self.l_stat.load_finished
-        )
+        self.main_obj.window.HtmlReport.loadStarted.connect(self.l_stat.load_started)
+        self.main_obj.window.HtmlReport.loadProgress.connect(self.l_stat.load_progress)
+        self.main_obj.window.HtmlReport.loadFinished.connect(self.l_stat.load_finished)
         self.lst_html = []
 
         first_half = """<html>
@@ -336,29 +324,24 @@ class DoLoadHTML(QObject):
             </body>
             </html>"""
 
-        self.not_avail_html = first_half \
-        + "There is no report available for this step." \
-        + second_half
+        self.not_avail_html = (
+            first_half + "There is no report available for this step." + second_half
+        )
 
-        self.loading_html = first_half \
-        + "  Loading ..." \
-        + second_half
+        self.loading_html = first_half + "  Loading ..." + second_half
 
-        self.failed_html = first_half \
-        + "  Failed Connection" \
-        + second_half
+        self.failed_html = first_half + "  Failed Connection" + second_half
 
-    def __call__(self, do_request = False):
+    def __call__(self, do_request=False):
         print("Do Request =", do_request)
         if do_request:
             print("Show HTML ... Start")
             nod_p_num = self.main_obj.curr_nod_num
             found_html = False
             for html_info in self.lst_html:
-                if(
+                if (
                     html_info["number"] == nod_p_num
-                    and
-                    len(html_info["html_report"]) > 5
+                    and len(html_info["html_report"]) > 5
                 ):
                     found_html = True
                     full_file = html_info["html_report"]
@@ -368,39 +351,29 @@ class DoLoadHTML(QObject):
                 self.main_obj.window.HtmlReport.setHtml(self.loading_html)
                 self.l_stat.load_started()
                 try:
-                    cmd = {
-                        "nod_lst":[nod_p_num],
-                        "cmd_lst":["get_report"]
-                    }
+                    cmd = {"nod_lst": [nod_p_num], "cmd_lst": ["get_report"]}
                     print("staring html request ...")
-                    req_gt = requests.get(
-                        self.uni_url, stream = True, params = cmd
-                    )
+                    req_gt = requests.get(self.uni_url, stream=True, params=cmd)
                     compresed = req_gt.content
                     print("... html request ended")
 
-                    full_file = zlib.decompress(compresed).decode('utf-8')
+                    full_file = zlib.decompress(compresed).decode("utf-8")
 
                     found_html = False
                     for html_info in self.lst_html:
-                        if(
-                            html_info["number"] == nod_p_num
-                        ):
+                        if html_info["number"] == nod_p_num:
                             found_html = True
                             html_info["html_report"] = full_file
 
                     if not found_html:
                         print("not found_html #2, After http request")
                         self.lst_html.append(
-                            {
-                                "number"       :nod_p_num,
-                                "html_report"   :full_file
-                            }
+                            {"number": nod_p_num, "html_report": full_file}
                         )
 
                 except ConnectionError:
                     print("\n Connection err catch (DoLoadHTML) \n")
-                    full_file = ''
+                    full_file = ""
 
                 except requests.exceptions.RequestException:
                     print("\n requests.exceptions.RequestException (DoLoadHTML) \n")
@@ -429,9 +402,7 @@ class DoLoadHTML(QObject):
                 tmp_file.write(full_file)
                 tmp_file.close()
 
-                self.main_obj.window.HtmlReport.load(
-                    QUrl.fromLocalFile(tmp_html_path)
-                )
+                self.main_obj.window.HtmlReport.load(QUrl.fromLocalFile(tmp_html_path))
 
             print("Show HTML ... End")
 
@@ -440,7 +411,7 @@ class DoLoadHTML(QObject):
 
 
 class ShowLog(QObject):
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(ShowLog, self).__init__(parent)
         self.main_obj = parent
         self.lst_node_log_out = []
@@ -450,7 +421,7 @@ class ShowLog(QObject):
 
         sys_font = QFont()
         font_point_size = sys_font.pointSize()
-        #my_font = QFont("Monospace", font_point_size, QFont.Bold)
+        # my_font = QFont("Monospace", font_point_size, QFont.Bold)
         my_font = QFont("Menlo", font_point_size, QFont.Bold)
         my_font.setFixedPitch(True)
 
@@ -461,7 +432,7 @@ class ShowLog(QObject):
         self.green_color = QColor(0, 155, 0)
         self.blue_color = QColor(0, 0, 255)
 
-    def __call__(self, nod_p_num = 0, do_request = False, stat = "Busy"):
+    def __call__(self, nod_p_num=0, do_request=False, stat="Busy"):
         print("Do Request =", do_request)
         if do_request:
             found_nod_num = False
@@ -472,15 +443,12 @@ class ShowLog(QObject):
 
             try:
                 if not found_nod_num:
-                    cmd = {"nod_lst":[nod_p_num], "cmd_lst":["display_log"]}
+                    cmd = {"nod_lst": [nod_p_num], "cmd_lst": ["display_log"]}
                     json_log = json_data_request(self.uni_url, cmd)
                     try:
                         lst_log_lines = json_log[0]
                         self.lst_node_log_out.append(
-                            {
-                                "number"       : nod_p_num,
-                                "log_line_lst"  : lst_log_lines
-                            }
+                            {"number": nod_p_num, "log_line_lst": lst_log_lines}
                         )
 
                     except TypeError:
@@ -515,10 +483,7 @@ class ShowLog(QObject):
 
         if not found_nod_num:
             self.lst_node_log_out.append(
-                {
-                    "number"       : nod_p_num,
-                    "log_line_lst"  : [new_line]
-                }
+                {"number": nod_p_num, "log_line_lst": [new_line]}
             )
 
         if self.main_obj.curr_nod_num == nod_p_num:
@@ -531,4 +496,3 @@ class ShowLog(QObject):
         self.main_obj.window.incoming_text.clear()
         self.main_obj.window.incoming_text.setTextColor(self.green_color)
         self.main_obj.window.incoming_text.insertPlainText("Ready to run: ")
-

@@ -1,13 +1,14 @@
-#uni_url = 'None'
+# uni_url = 'None'
 
 import os, sys
 from shared_modules import format_utils
+
 
 class ini_data(object):
     def __init__(self):
         print("ini_data.__init__()")
 
-    def set_data(self, par_def = None):
+    def set_data(self, par_def=None):
         init_param = format_utils.get_par(par_def, sys.argv[1:])
         print("init_param =", init_param)
         global win_exe
@@ -26,4 +27,3 @@ class ini_data(object):
 if __name__ == "__main__":
     init_firts = ini_data()
     print("ini_data.uni_url =", init_firts.get_url())
-

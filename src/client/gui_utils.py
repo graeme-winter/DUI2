@@ -31,111 +31,106 @@ import numpy as np
 from shared_modules import format_utils
 
 widgets_defs = {
-    "Root" : {
-        "tooltip"       : "Root node ... Not supposed to run any code",
-        "icon"          : "resources/root.png",
-        "main_cmd"      :["# root node"],
-        "nxt_widg_lst"  :["import"]
+    "Root": {
+        "tooltip": "Root node ... Not supposed to run any code",
+        "icon": "resources/root.png",
+        "main_cmd": ["# root node"],
+        "nxt_widg_lst": ["import"],
     },
-    "import" : {
-        "tooltip"       : "dials.import ...",
-        "icon"          : "resources/import.png",
-        "main_cmd"      :["dials.import"],
-        "nxt_widg_lst"  :["find_spots", "apply_mask"]
+    "import": {
+        "tooltip": "dials.import ...",
+        "icon": "resources/import.png",
+        "main_cmd": ["dials.import"],
+        "nxt_widg_lst": ["find_spots", "apply_mask"],
     },
-    "apply_mask" : {
-        "tooltip"       : "dials.generate_mask && dials.apply_mask ...",
-        "icon"          : "resources/mask.png",
-        "main_cmd"      :['dials.generate_mask','dials.apply_mask'],
-        "nxt_widg_lst"  :["find_spots"]
+    "apply_mask": {
+        "tooltip": "dials.generate_mask && dials.apply_mask ...",
+        "icon": "resources/mask.png",
+        "main_cmd": ["dials.generate_mask", "dials.apply_mask"],
+        "nxt_widg_lst": ["find_spots"],
     },
-    "find_spots" : {
-        "tooltip"       : "dials.find_spots ...",
-        "icon"          : "resources/find_spots.png",
-        "main_cmd"      :["dials.find_spots"],
-        "nxt_widg_lst"  :["index", "combine_experiments", "optional"]
+    "find_spots": {
+        "tooltip": "dials.find_spots ...",
+        "icon": "resources/find_spots.png",
+        "main_cmd": ["dials.find_spots"],
+        "nxt_widg_lst": ["index", "combine_experiments", "optional"],
     },
-    "index" : {
-        "tooltip"       : "dials.index ...",
-        "icon"          : "resources/index.png",
-        "main_cmd"      :["dials.index"],
-        "nxt_widg_lst"  :[
+    "index": {
+        "tooltip": "dials.index ...",
+        "icon": "resources/index.png",
+        "main_cmd": ["dials.index"],
+        "nxt_widg_lst": [
             "refine_bravais_settings",
             "refine",
             "combine_experiments",
-            "optional"
-        ]
+            "optional",
+        ],
     },
-    "refine_bravais_settings" : {
-        "tooltip"       : "dials.refine_bravais_settings ...",
-        "icon"          : "resources/refine_bv_set.png",
-        "main_cmd"      :["dials.refine_bravais_settings"],
-        "nxt_widg_lst"  :["reindex"]
+    "refine_bravais_settings": {
+        "tooltip": "dials.refine_bravais_settings ...",
+        "icon": "resources/refine_bv_set.png",
+        "main_cmd": ["dials.refine_bravais_settings"],
+        "nxt_widg_lst": ["reindex"],
     },
-    "reindex" : {
-        "tooltip"       : "dials.reindex ...",
-        "icon"          : "resources/reindex.png",
-        "main_cmd"      :["dials.reindex"],
-        "nxt_widg_lst"  :[
-            "refine", "integrate", "combine_experiments", "optional"
-        ]
+    "reindex": {
+        "tooltip": "dials.reindex ...",
+        "icon": "resources/reindex.png",
+        "main_cmd": ["dials.reindex"],
+        "nxt_widg_lst": ["refine", "integrate", "combine_experiments", "optional"],
     },
-    "refine" : {
-        "tooltip"       : "dials.refine ...",
-        "icon"          : "resources/refine.png",
-        "main_cmd"      :["dials.refine"],
-        "nxt_widg_lst"  :[
+    "refine": {
+        "tooltip": "dials.refine ...",
+        "icon": "resources/refine.png",
+        "main_cmd": ["dials.refine"],
+        "nxt_widg_lst": [
             "integrate",
             "refine_bravais_settings",
             "combine_experiments",
-            "optional"
-        ]
+            "optional",
+        ],
     },
-    "integrate" : {
-        "tooltip"       : "dials.integrate ...",
-        "icon"          : "resources/integrate.png",
-        "main_cmd"      :["dials.integrate"],
-        "nxt_widg_lst"  :[
-            "symmetry", "scale", "combine_experiments", "export", "optional"
-        ]
+    "integrate": {
+        "tooltip": "dials.integrate ...",
+        "icon": "resources/integrate.png",
+        "main_cmd": ["dials.integrate"],
+        "nxt_widg_lst": [
+            "symmetry",
+            "scale",
+            "combine_experiments",
+            "export",
+            "optional",
+        ],
     },
-    "symmetry" : {
-        "tooltip"       : "dials.symmetry ...",
-        "icon"          : "resources/symmetry.png",
-        "main_cmd"      :["dials.symmetry"],
-        "nxt_widg_lst"  :["scale", "combine_experiments", "export", "optional"]
+    "symmetry": {
+        "tooltip": "dials.symmetry ...",
+        "icon": "resources/symmetry.png",
+        "main_cmd": ["dials.symmetry"],
+        "nxt_widg_lst": ["scale", "combine_experiments", "export", "optional"],
     },
-    "scale" : {
-        "tooltip"       : "dials.scale ...",
-        "icon"          : "resources/scale.png",
-        "main_cmd"      :["dials.scale"],
-        "nxt_widg_lst"  :[
-            "symmetry", "combine_experiments", "export", "optional"
-        ]
+    "scale": {
+        "tooltip": "dials.scale ...",
+        "icon": "resources/scale.png",
+        "main_cmd": ["dials.scale"],
+        "nxt_widg_lst": ["symmetry", "combine_experiments", "export", "optional"],
     },
-    "export" : {
-        "tooltip"       : "dials.export ...",
-        "icon"          : "resources/export.png",
-        "main_cmd"      :["dials.export"],
-        "nxt_widg_lst"  :[]
+    "export": {
+        "tooltip": "dials.export ...",
+        "icon": "resources/export.png",
+        "main_cmd": ["dials.export"],
+        "nxt_widg_lst": [],
     },
-    "combine_experiments"   : {
-        "tooltip"           : "dials.combine_experiments ...",
-        "icon"              : "resources/combine.png",
-        "main_cmd"          :["dials.combine_experiments"],
-        "nxt_widg_lst"      :[
-            "index", "refine", "integrate", "export", "optional"
-        ]
+    "combine_experiments": {
+        "tooltip": "dials.combine_experiments ...",
+        "icon": "resources/combine.png",
+        "main_cmd": ["dials.combine_experiments"],
+        "nxt_widg_lst": ["index", "refine", "integrate", "export", "optional"],
     },
-
-    "optional" : {
-        "tooltip"       : "choose from a list",
-        "icon"          : "resources/optional.png",
-        "main_cmd"      :["dials.optional"],
-        "nxt_widg_lst"  :[
-            "find_spots", "index", "refine", "integrate", "export"
-        ]
-    }
+    "optional": {
+        "tooltip": "choose from a list",
+        "icon": "resources/optional.png",
+        "main_cmd": ["dials.optional"],
+        "nxt_widg_lst": ["find_spots", "index", "refine", "integrate", "export"],
+    },
 }
 
 
@@ -146,7 +141,7 @@ def get_widget_def_dict(in_dic, ui_path):
         new_inner_dict = dict(value)
         nxt_ico = QIcon()
         icon_path = ui_path + os.sep + new_inner_dict["icon"]
-        nxt_ico.addFile(icon_path, mode = QIcon.Normal)
+        nxt_ico.addFile(icon_path, mode=QIcon.Normal)
         new_inner_dict["icon"] = nxt_ico
         out_dic[str(key)] = dict(new_inner_dict)
 
@@ -154,10 +149,11 @@ def get_widget_def_dict(in_dic, ui_path):
 
 
 class find_scale_cmd(object):
-    '''
+    """
     This class works as a function that internally navigates with
     recursive calls to find out if there is a << dials.scale >> command
-    '''
+    """
+
     def __init__(self, nod_lst, parent_num_lst):
         self.nod_lst = nod_lst
         self.found_scale = False
@@ -176,17 +172,17 @@ class find_scale_cmd(object):
 
 
 class find_next_cmd(object):
-    '''
+    """
     This class works as a function that internally navigates with
     recursive calls to find the possible command to run next
-    '''
+    """
+
     def __init__(
-        self, nod_lst_in, parent_nod_num_lst,
-        str_key, param_widgets, opt_cmd_lst
+        self, nod_lst_in, parent_nod_num_lst, str_key, param_widgets, opt_cmd_lst
     ):
         self.nod_lst = nod_lst_in
         self.remove_combine = False
-        #TODO fix this what to do twise the same, next IF vs TRY later
+        # TODO fix this what to do twise the same, next IF vs TRY later
         if str_key == "combine_experiments":
             parent_num = parent_nod_num_lst[0]
             str_key = self.nod_lst[parent_num]["cmd2show"][0][6:]
@@ -195,7 +191,7 @@ class find_next_cmd(object):
         try:
             self.default_list = param_widgets[str_key]["nxt_widg_lst"]
 
-        #TODO fix this what to do twise the same, next TRY vs IF previous
+        # TODO fix this what to do twise the same, next TRY vs IF previous
         except KeyError:
             if str_key in opt_cmd_lst:
                 parent_num = parent_nod_num_lst[0]
@@ -236,10 +232,7 @@ class MyQComboBox(QComboBox):
         self.setFocusPolicy(Qt.ClickFocus)
 
     def wheelEvent(self, event):
-        print(
-            "event: \n", event,
-            "\n not suposed to change with wheel event"
-        )
+        print("event: \n", event, "\n not suposed to change with wheel event")
         return
 
 
@@ -247,7 +240,7 @@ class AdvancedParameters(QWidget):
 
     item_changed = Signal(str, str)
 
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(AdvancedParameters, self).__init__(parent)
         self.do_emit = True
         self.main_vbox = QVBoxLayout()
@@ -264,9 +257,7 @@ class AdvancedParameters(QWidget):
 
         self.lst_par_line = lst_phil_obj
         print("Hi from build_pars")
-        self.norm_labl_font = QFont(
-            "Monospace", self.font_point_size, QFont.Bold
-        )
+        self.norm_labl_font = QFont("Monospace", self.font_point_size, QFont.Bold)
 
         for data_info in self.lst_par_line:
             label_str = "    " * data_info["indent"]
@@ -288,11 +279,7 @@ class AdvancedParameters(QWidget):
                 new_label.setStyleSheet("color: rgba(105, 105, 105, 255)")
                 new_hbox.addWidget(new_label)
 
-            elif(
-                (data_info["type"] == "bool"
-                 or
-                 data_info["type"] == "choice")
-            ):
+            elif data_info["type"] == "bool" or data_info["type"] == "choice":
                 new_label.setStyleSheet("color: rgba(0, 0, 0, 255)")
                 new_hbox.addWidget(new_label)
 
@@ -370,10 +357,7 @@ class AdvancedParameters(QWidget):
                     self.do_emit = True
 
     def update_all_pars(self, tup_lst_pars):
-        print(
-            "\n (Advanced Widget) \n time to update par to:",
-            tup_lst_pars, "\n"
-        )
+        print("\n (Advanced Widget) \n time to update par to:", tup_lst_pars, "\n")
         for par_dic in tup_lst_pars[0]:
             self.update_param(par_dic["name"], par_dic["value"])
 
@@ -398,11 +382,7 @@ class AdvancedParameters(QWidget):
             except KeyError:
                 default = None
 
-            if(
-                (data_info["type"] == "bool"
-                 or
-                 data_info["type"] == "choice")
-            ):
+            if data_info["type"] == "bool" or data_info["type"] == "choice":
                 try:
                     data_info["widget"].setCurrentIndex(default)
 
@@ -423,10 +403,7 @@ class AdvancedParameters(QWidget):
                     labl_text = str(widget.text())
                     if str_value in labl_text:
                         widget.setFont(
-                            QFont(
-                                "Monospace",
-                                self.font_point_size + 5, QFont.Bold
-                            )
+                            QFont("Monospace", self.font_point_size + 5, QFont.Bold)
                         )
 
                     else:
@@ -439,8 +416,7 @@ class AdvancedParameters(QWidget):
 
 
 def draw_quadratic_bezier_3_points(
-        scene_obj, p1x, p1y, p2x, p2y, p3x, p3y,
-        lin_pen, row_size, col_size
+    scene_obj, p1x, p1y, p2x, p2y, p3x, p3y, lin_pen, row_size, col_size
 ):
     arrow_head = False
     curved_corners = True
@@ -449,17 +425,33 @@ def draw_quadratic_bezier_3_points(
     if arrow_head:
         if p1x == p2x:
             scene_obj.addLine(
-                p3x, p3y, p3x - col_size * arrow_head_W, p3y - row_size * arrow_head_H, lin_pen
+                p3x,
+                p3y,
+                p3x - col_size * arrow_head_W,
+                p3y - row_size * arrow_head_H,
+                lin_pen,
             )
             scene_obj.addLine(
-                p3x, p3y, p3x - col_size * arrow_head_W, p3y + row_size * arrow_head_H, lin_pen
+                p3x,
+                p3y,
+                p3x - col_size * arrow_head_W,
+                p3y + row_size * arrow_head_H,
+                lin_pen,
             )
         else:
             scene_obj.addLine(
-                p3x, p3y, p3x - col_size * arrow_head_W, p3y - row_size * arrow_head_H, lin_pen
+                p3x,
+                p3y,
+                p3x - col_size * arrow_head_W,
+                p3y - row_size * arrow_head_H,
+                lin_pen,
             )
             scene_obj.addLine(
-                p3x, p3y, p3x + col_size * arrow_head_W, p3y - row_size * arrow_head_H, lin_pen
+                p3x,
+                p3y,
+                p3x + col_size * arrow_head_W,
+                p3y - row_size * arrow_head_H,
+                lin_pen,
             )
 
     if curved_corners:
@@ -598,7 +590,8 @@ def add_ready_node(old_lst_nodes, com_par):
 
 class TreeDirScene(QGraphicsScene):
     node_clicked = Signal(int)
-    def __init__(self, parent = None):
+
+    def __init__(self, parent=None):
         super(TreeDirScene, self).__init__(parent)
         self.setFont(QFont("Monospace"))
         fm = QFontMetrics(self.font())
@@ -624,33 +617,19 @@ class TreeDirScene(QGraphicsScene):
         self.invisible_brush = QBrush(Qt.white, Qt.NoBrush)
         self.blue_gradient_brush = QBrush(Qt.blue, Qt.SolidPattern)
 
-        self.black_pen = QPen(
-            Qt.black, 1.6, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin
-        )
-        self.green_pen = QPen(
-            Qt.green, 1.6, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin
-        )
+        self.black_pen = QPen(Qt.black, 1.6, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin)
+        self.green_pen = QPen(Qt.green, 1.6, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin)
         self.dark_green_pen = QPen(
             Qt.darkGreen, 1.6, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin
         )
-        self.red_pen = QPen(
-            Qt.red, 1.6, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin
-        )
-        self.blue_pen = QPen(
-            Qt.blue, 1.6, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin
-        )
+        self.red_pen = QPen(Qt.red, 1.6, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin)
+        self.blue_pen = QPen(Qt.blue, 1.6, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin)
         self.dark_blue_pen = QPen(
             Qt.darkBlue, 1.9, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin
         )
-        self.cyan_pen = QPen(
-            Qt.cyan, 2, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin
-        )
-        self.gray_pen = QPen(
-            Qt.gray, 2, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin
-        )
-        self.white_pen = QPen(
-            Qt.white, 2, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin
-        )
+        self.cyan_pen = QPen(Qt.cyan, 2, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin)
+        self.gray_pen = QPen(Qt.gray, 2, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin)
+        self.white_pen = QPen(Qt.white, 2, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin)
         self.lst_nod_pos = []
         self.nod_lst = None
 
@@ -673,7 +652,7 @@ class TreeDirScene(QGraphicsScene):
                     self.draw_all()
 
     def get_coords(self, row, col):
-        return col * self.f_width * 4, row  * self.f_height * 2
+        return col * self.f_width * 4, row * self.f_height * 2
 
     def get_pen_colour(self, stat):
         if stat == "S":
@@ -730,24 +709,29 @@ class TreeDirScene(QGraphicsScene):
                     max_cmd_len = node_len
 
             right_x, down_y = self.get_coords(
-                len(self.nod_lst),
-                max_indent * 1.2 + max_cmd_len * 0.3 + 7
+                len(self.nod_lst), max_indent * 1.2 + max_cmd_len * 0.3 + 7
             )
             left_x, up_y = self.get_coords(-1, -1)
             dx = right_x - left_x
             dy = down_y - up_y
             self.addRect(
-                left_x - self.f_width, up_y,
-                dx + self.f_width, dy,
-                self.gray_pen, self.light_gray_brush
+                left_x - self.f_width,
+                up_y,
+                dx + self.f_width,
+                dy,
+                self.gray_pen,
+                self.light_gray_brush,
             )
             for i in range(int((len(self.nod_lst) - 1) / 2 + 1)):
                 pos = i * 2
                 my_x, my_y = self.get_coords(pos, -1)
                 self.addRect(
-                    left_x, my_y - self.f_height,
-                    dx - self.f_width, self.f_height * 2,
-                    self.white_pen, self.white_brush
+                    left_x,
+                    my_y - self.f_height,
+                    dx - self.f_width,
+                    self.f_height * 2,
+                    self.white_pen,
+                    self.white_brush,
                 )
 
             for pos, node in enumerate(self.nod_lst):
@@ -755,24 +739,25 @@ class TreeDirScene(QGraphicsScene):
                     current_nod_pos = pos
                     right_x1, down_y1 = self.get_coords(
                         current_nod_pos + 0.43,
-                        max_indent * 1.2 + max_cmd_len * 0.3 + 6.7
+                        max_indent * 1.2 + max_cmd_len * 0.3 + 6.7,
                     )
-                    left_x1, up_y1 = self.get_coords(
-                        current_nod_pos - 0.43, -0.7
-                    )
+                    left_x1, up_y1 = self.get_coords(current_nod_pos - 0.43, -0.7)
                     dx1 = right_x1 - left_x1
                     dy1 = down_y1 - up_y1
                     rect_border_colour = self.get_pen_colour(node["stp_stat"])
                     self.addRect(
-                        left_x1 - self.f_width, up_y1,
-                        dx1 + self.f_width, dy1,
-                        rect_border_colour, self.cyan_brush
+                        left_x1 - self.f_width,
+                        up_y1,
+                        dx1 + self.f_width,
+                        dy1,
+                        rect_border_colour,
+                        self.cyan_brush,
                     )
 
             row_size, col_size = self.get_coords(0.5, 0.5)
             for pos, node in enumerate(self.nod_lst):
                 if len(node["par_lst"]) > 1:
-                    my_coord_x ,my_coord_y = self.get_coords(pos, node["indent"])
+                    my_coord_x, my_coord_y = self.get_coords(pos, node["indent"])
                     lst2connect = []
                     for par_pos, prev in enumerate(self.nod_lst[0:pos]):
                         if prev["number"] in node["par_lst"]:
@@ -797,11 +782,13 @@ class TreeDirScene(QGraphicsScene):
                                 my_parent_coord_y,
                                 my_coord_x + self.f_width * 0.5,
                                 my_coord_y - self.f_height * 0.95,
-                                arr_col, row_size, col_size
+                                arr_col,
+                                row_size,
+                                col_size,
                             )
 
             for pos, node in enumerate(self.nod_lst):
-                my_coord_x ,my_coord_y = self.get_coords(pos, node["indent"])
+                my_coord_x, my_coord_y = self.get_coords(pos, node["indent"])
                 if pos > 0:
                     for inner_row, inner_node in enumerate(self.nod_lst):
                         if inner_node["number"] == node["low_par_nod_num"]:
@@ -813,20 +800,23 @@ class TreeDirScene(QGraphicsScene):
                                 self,
                                 my_parent_coord_x,
                                 my_parent_coord_y + self.f_height * 0.9,
-                                my_parent_coord_x, my_coord_y,
+                                my_parent_coord_x,
+                                my_coord_y,
                                 my_coord_x - self.f_width * 1.6,
                                 my_coord_y,
-                                arr_col, row_size, col_size
+                                arr_col,
+                                row_size,
+                                col_size,
                             )
 
             self.lst_nod_pos = []
             nod_bar_pos = self.bar_pos
             for pos, node in enumerate(self.nod_lst):
-                my_coord_x ,my_coord_y = self.get_coords(pos, node["indent"])
+                my_coord_x, my_coord_y = self.get_coords(pos, node["indent"])
                 nod_pos = {
                     "number": node["number"],
                     "x_pos": my_coord_x,
-                    "y_pos": my_coord_y
+                    "y_pos": my_coord_y,
                 }
                 self.lst_nod_pos.append(nod_pos)
                 border_colour = self.get_pen_colour(node["stp_stat"])
@@ -836,7 +826,8 @@ class TreeDirScene(QGraphicsScene):
                     my_coord_y - self.f_height * 0.9,
                     self.f_width * 3.6,
                     self.f_height * 1.8,
-                    border_colour, self.invisible_brush
+                    border_colour,
+                    self.invisible_brush,
                 )
                 try:
                     tmp_pxm = self.addPixmap(self.px_map[node["str_cmd"]])
@@ -846,40 +837,40 @@ class TreeDirScene(QGraphicsScene):
 
                 tmp_pxm.setPos(
                     my_coord_x - self.f_width * 2.6 + self.f_width * 0.9,
-                    my_coord_y - self.f_height * 0.9 + self.f_height * 0.1
+                    my_coord_y - self.f_height * 0.9 + self.f_height * 0.1,
                 )
 
-                my_coord_x ,my_coord_y = self.get_coords(pos, -0.6)
+                my_coord_x, my_coord_y = self.get_coords(pos, -0.6)
                 n_text = self.addSimpleText(str(node["number"]))
-                n_text.setPos(my_coord_x - self.f_width * 0.7,
-                            my_coord_y - self.f_height * 0.5)
+                n_text.setPos(
+                    my_coord_x - self.f_width * 0.7, my_coord_y - self.f_height * 0.5
+                )
                 n_text.setBrush(self.dark_blue_brush)
 
-                my_coord_x ,my_coord_y = self.get_coords(
+                my_coord_x, my_coord_y = self.get_coords(
                     pos, max_indent * 1.2 + max_cmd_len * 0.3 + 6.1
                 )
                 n_text = self.addSimpleText(str(node["number"]))
-                n_text.setPos(my_coord_x - self.f_width * 0.7,
-                            my_coord_y - self.f_height * 0.5)
+                n_text.setPos(
+                    my_coord_x - self.f_width * 0.7, my_coord_y - self.f_height * 0.5
+                )
                 n_text.setBrush(self.dark_blue_brush)
 
                 stat_text = self.addSimpleText(str(node["stp_stat"]))
-                stat_text.setPos(
-                    self.f_width * 0.5,
-                    my_coord_y - self.f_height * 0.5
-                )
+                stat_text.setPos(self.f_width * 0.5, my_coord_y - self.f_height * 0.5)
                 stat_text.setBrush(self.dark_blue_brush)
                 if str(node["stp_stat"]) == "B":
-                    right_x1, down_y1 = self.get_coords(
-                        pos + 0.3, max_indent + 1
-                    )
+                    right_x1, down_y1 = self.get_coords(pos + 0.3, max_indent + 1)
                     left_x1, up_y1 = self.get_coords(pos - 0.3, max_indent + 4)
                     dx1 = right_x1 - left_x1
                     dy1 = down_y1 - up_y1
                     self.addRect(
-                        left_x1 - self.f_width, up_y1,
-                        dx1 + self.f_width, dy1,
-                        self.dark_blue_pen, self.white_brush
+                        left_x1 - self.f_width,
+                        up_y1,
+                        dx1 + self.f_width,
+                        dy1,
+                        self.dark_blue_pen,
+                        self.white_brush,
                     )
                     right_x1, down_y1 = self.get_coords(
                         pos + 0.3, max_indent + nod_bar_pos
@@ -890,9 +881,12 @@ class TreeDirScene(QGraphicsScene):
                     dx1 = right_x1 - left_x1
                     dy1 = down_y1 - up_y1
                     self.addRect(
-                        left_x1 - self.f_width, up_y1,
-                        dx1 + self.f_width, dy1,
-                        self.dark_blue_pen, self.dark_blue_brush
+                        left_x1 - self.f_width,
+                        up_y1,
+                        dx1 + self.f_width,
+                        dy1,
+                        self.dark_blue_pen,
+                        self.dark_blue_brush,
                     )
 
                 cmd_text = self.addSimpleText(str(node["str_cmd"]))
@@ -903,12 +897,10 @@ class TreeDirScene(QGraphicsScene):
 
             self.update()
 
-    def draw_tree_graph(
-            self, nod_lst_in = [], curr_nod_num = 0, new_node = None
-    ):
+    def draw_tree_graph(self, nod_lst_in=[], curr_nod_num=0, new_node=None):
         tmp_local_lst = copy_lst_nodes(nod_lst_in)
         self.paint_nod_lst = add_ready_node(tmp_local_lst, new_node)
-        lst_str = self.tree_obj(lst_nod = self.paint_nod_lst)
+        lst_str = self.tree_obj(lst_nod=self.paint_nod_lst)
         lst_2d_dat = self.tree_obj.get_tree_data()
 
         self.nod_lst = lst_2d_dat
@@ -918,4 +910,3 @@ class TreeDirScene(QGraphicsScene):
     def new_nod_num(self, nod_num_in):
         self.curr_nod_num = nod_num_in
         self.draw_all()
-

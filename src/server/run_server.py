@@ -30,47 +30,116 @@ from server.data_n_json import iter_dict
 from shared_modules import format_utils
 from server.init_first import ini_data
 
-def main(par_def = None, connection_out = None):
-    print("                                                                                                ")
-    print("                                                          .. .. .....                           ")
-    print("                                                   ........................                     ")
-    print("                                              ........................'..'..'...                ")
-    print("                                           ..............................'..'..'..              ")
-    print("                                         ................................'..'..'.....           ")
-    print("                                       ........................................'....'..         ")
-    print("                                    ................................................'....       ")
-    print("                                   .......................................................      ")
-    print("             ................     ........'..........'.....................................     ")
-    print("         .......'..'..''..'..'...'...'.....................................................'    ")
-    print("       .'.'..'.''.''..'..'..''..'...........'..............................................'.   ")
-    print("     ..'.'.''..'....'...''..'......'...'.......'...........................................'..  ")
-    print("   .'.''''.'..,',,,','','..'..',,''.......','.'.......,,..........'.......'..'.............'..  ")
-    print("  .''.'.'.''',k0O00O00OOOkd,..'xKO,..''.'lkKKOo..''..;0Kk.....'....'d00KK0KKKKKKc.............. ")
-    print("  .'.'.''''..,O00olllollok0O,''x0O'.....x00do0Kd.....cKKk'.........xK0olllllcllo,.............. ")
-    print(" .''''''.'..',k00;'..'..'o00;'.x0O'.'..o0Kx.'oK0d'..'cXXk...'......xK0cclc::::;'..............' ")
-    print(" ''''.'.''''''kK0;''''..'dKO;..d0O,'..l0K0l:::O00d...:K0x...'......,dO00KKKKKKKKd.............' ")
-    print(" ''''''''.''.,k0O;..'..''d0O,..xK0,'.cO00000KK00KKo'.:K0k......'..........''.:KX0'............. ")
-    print(" '''''''''''',O0Okkxxxxxk00o..'x0O;.;00k'','',,:0K0c..d0KkxxkkkkkOlckkxkkkkkkOKXx.............. ")
-    print(" ''''''''''.',lddddddddooo:'.''ldo'.loo;.'......,odo'.':oddddooodx::dddddoodddl:............... ")
-    print(" .''''''.'''''','',,,,,,','.',,,,,'.','.,''.,,...,...''..''..'...''.''........................  ")
-    print("  .''''''''''',,',,,,;'',,,,',,,;;,,,,,,;''.,,'.,,'',,''','',,..,,'',..','.''',''.............  ")
-    print("   .''''''.'''''.''.''''''.''..'''.''..'...''..''.......'...'................................   ")
-    print("    .''''''''''.'''''..''.'''..'..''..'''..'...'...'...........'............................    ")
-    print("      .'''''''''''.''.'''.''..''''''..'...''..''......'...'................................     ")
-    print("        .''''''''''''.''..''.''... ..'''..'...'..''...'..........'.......................       ")
-    print("          ...'''''''.''''''.....     .'..'..'''..'.......'...'.........................         ")
-    print("                ..........             .''..''..'...'...'..........'.................           ")
-    print("                                         ..''..''..'...'...'...'...................             ")
-    print("                                           ....'..'...''..'.......................              ")
-    print("                                              ...''..''..'..'...'.............                  ")
-    print("                                                    ....'..''..'..........                      ")
-    print("                                                                                                ")
+
+def main(par_def=None, connection_out=None):
+    print(
+        "                                                                                                "
+    )
+    print(
+        "                                                          .. .. .....                           "
+    )
+    print(
+        "                                                   ........................                     "
+    )
+    print(
+        "                                              ........................'..'..'...                "
+    )
+    print(
+        "                                           ..............................'..'..'..              "
+    )
+    print(
+        "                                         ................................'..'..'.....           "
+    )
+    print(
+        "                                       ........................................'....'..         "
+    )
+    print(
+        "                                    ................................................'....       "
+    )
+    print(
+        "                                   .......................................................      "
+    )
+    print(
+        "             ................     ........'..........'.....................................     "
+    )
+    print(
+        "         .......'..'..''..'..'...'...'.....................................................'    "
+    )
+    print(
+        "       .'.'..'.''.''..'..'..''..'...........'..............................................'.   "
+    )
+    print(
+        "     ..'.'.''..'....'...''..'......'...'.......'...........................................'..  "
+    )
+    print(
+        "   .'.''''.'..,',,,','','..'..',,''.......','.'.......,,..........'.......'..'.............'..  "
+    )
+    print(
+        "  .''.'.'.''',k0O00O00OOOkd,..'xKO,..''.'lkKKOo..''..;0Kk.....'....'d00KK0KKKKKKc.............. "
+    )
+    print(
+        "  .'.'.''''..,O00olllollok0O,''x0O'.....x00do0Kd.....cKKk'.........xK0olllllcllo,.............. "
+    )
+    print(
+        " .''''''.'..',k00;'..'..'o00;'.x0O'.'..o0Kx.'oK0d'..'cXXk...'......xK0cclc::::;'..............' "
+    )
+    print(
+        " ''''.'.''''''kK0;''''..'dKO;..d0O,'..l0K0l:::O00d...:K0x...'......,dO00KKKKKKKKd.............' "
+    )
+    print(
+        " ''''''''.''.,k0O;..'..''d0O,..xK0,'.cO00000KK00KKo'.:K0k......'..........''.:KX0'............. "
+    )
+    print(
+        " '''''''''''',O0Okkxxxxxk00o..'x0O;.;00k'','',,:0K0c..d0KkxxkkkkkOlckkxkkkkkkOKXx.............. "
+    )
+    print(
+        " ''''''''''.',lddddddddooo:'.''ldo'.loo;.'......,odo'.':oddddooodx::dddddoodddl:............... "
+    )
+    print(
+        " .''''''.'''''','',,,,,,','.',,,,,'.','.,''.,,...,...''..''..'...''.''........................  "
+    )
+    print(
+        "  .''''''''''',,',,,,;'',,,,',,,;;,,,,,,;''.,,'.,,'',,''','',,..,,'',..','.''',''.............  "
+    )
+    print(
+        "   .''''''.'''''.''.''''''.''..'''.''..'...''..''.......'...'................................   "
+    )
+    print(
+        "    .''''''''''.'''''..''.'''..'..''..'''..'...'...'...........'............................    "
+    )
+    print(
+        "      .'''''''''''.''.'''.''..''''''..'...''..''......'...'................................     "
+    )
+    print(
+        "        .''''''''''''.''..''.''... ..'''..'...'..''...'..........'.......................       "
+    )
+    print(
+        "          ...'''''''.''''''.....     .'..'..'''..'.......'...'.........................         "
+    )
+    print(
+        "                ..........             .''..''..'...'...'..........'.................           "
+    )
+    print(
+        "                                         ..''..''..'...'...'...'...................             "
+    )
+    print(
+        "                                           ....'..'...''..'.......................              "
+    )
+    print(
+        "                                              ...''..''..'..'...'.............                  "
+    )
+    print(
+        "                                                    ....'..''..'..........                      "
+    )
+    print(
+        "                                                                                                "
+    )
 
     class ReqHandler(http.server.BaseHTTPRequestHandler):
         def do_POST(self):
-            content_len = int(self.headers.get('Content-Length'))
+            content_len = int(self.headers.get("Content-Length"))
             post_body = self.rfile.read(content_len)
-            body_str = str(post_body.decode('utf-8'))
+            body_str = str(post_body.decode("utf-8"))
             url_dict = parse_qs(body_str)
             print("\n url_dict =", url_dict, "\n")
             try:
@@ -79,12 +148,12 @@ def main(par_def = None, connection_out = None):
 
             except KeyError:
                 print("no command in request (KeyError)")
-                self.send_header('Content-type', 'text/plain')
+                self.send_header("Content-type", "text/plain")
                 self.end_headers()
-                self.wfile.write(bytes(
-                    'no command in request (Key err catch ) \n', 'utf-8'
-                ))
-                self.wfile.write(bytes('/*EOF*/', 'utf-8'))
+                self.wfile.write(
+                    bytes("no command in request (Key err catch ) \n", "utf-8")
+                )
+                self.wfile.write(bytes("/*EOF*/", "utf-8"))
                 return
 
             cmd_lst = []
@@ -99,22 +168,18 @@ def main(par_def = None, connection_out = None):
             except KeyError:
                 print("no node number provided")
 
-            cmd_dict = {"nod_lst":nod_lst,
-                        "cmd_lst":cmd_lst}
+            cmd_dict = {"nod_lst": nod_lst, "cmd_lst": cmd_lst}
 
             try:
                 cmd_tree_runner.run_dials_command(cmd_dict, self)
                 print("sending /*EOF*/")
-                self.wfile.write(bytes('/*EOF*/', 'utf-8'))
-
+                self.wfile.write(bytes("/*EOF*/", "utf-8"))
 
             except BrokenPipeError:
                 print("\n** BrokenPipe err catch  ** while sending EOF or JSON\n")
 
             except ConnectionResetError:
-                print(
-                    "\n** ConnectionReset err catch  ** while sending EOF or JSON\n"
-                )
+                print("\n** ConnectionReset err catch  ** while sending EOF or JSON\n")
 
         def do_GET(self):
 
@@ -128,12 +193,10 @@ def main(par_def = None, connection_out = None):
 
             except KeyError:
                 print("no command in request (Key err catch )")
-                self.send_header('Content-type', 'text/plain')
+                self.send_header("Content-type", "text/plain")
                 self.end_headers()
-                self.wfile.write(bytes(
-                    'no command in request (KeyError) \n', 'utf-8'
-                ))
-                self.wfile.write(bytes('/*EOF*/', 'utf-8'))
+                self.wfile.write(bytes("no command in request (KeyError) \n", "utf-8"))
+                self.wfile.write(bytes("/*EOF*/", "utf-8"))
                 return
 
             cmd_lst = []
@@ -148,19 +211,18 @@ def main(par_def = None, connection_out = None):
             except KeyError:
                 print("no node number provided")
 
-            cmd_dict = {"nod_lst":nod_lst,
-                        "cmd_lst":cmd_lst}
+            cmd_dict = {"nod_lst": nod_lst, "cmd_lst": cmd_lst}
             try:
-                #lst_out = []
+                # lst_out = []
                 lst_out = cmd_tree_runner.run_get_data(cmd_dict)
 
                 if type(lst_out) is list or type(lst_out) is dict:
-                    self.send_header('Content-type', 'text/plain')
+                    self.send_header("Content-type", "text/plain")
                     self.end_headers()
-                    json_str = json.dumps(lst_out) + '\n'
-                    self.wfile.write(bytes(json_str, 'utf-8'))
+                    json_str = json.dumps(lst_out) + "\n"
+                    self.wfile.write(bytes(json_str, "utf-8"))
 
-                    if lst_out == ['closed received']:
+                    if lst_out == ["closed received"]:
                         print("Client app closed")
                         print("run_local =", run_local)
                         sep_lin = "#" * 44 + "\n"
@@ -187,23 +249,20 @@ def main(par_def = None, connection_out = None):
                     siz_dat = str(len(byt_data))
                     print("size =", siz_dat)
 
-                    self.send_header('Content-type', 'application/zlib')
-                    self.send_header('Content-Length', siz_dat)
+                    self.send_header("Content-type", "application/zlib")
+                    self.send_header("Content-Length", siz_dat)
                     self.end_headers()
 
                     self.wfile.write(bytes(byt_data))
 
-
                 print("sending /*EOF*/")
-                self.wfile.write(bytes('/*EOF*/', 'utf-8'))
+                self.wfile.write(bytes("/*EOF*/", "utf-8"))
 
             except BrokenPipeError:
                 print("\n BrokenPipe err catch  while sending EOF or JSON \n")
 
             except ConnectionResetError:
-                print(
-                    "\n ** ConnectionReset err catch  ** while sending EOF or JSON\n"
-                )
+                print("\n ** ConnectionReset err catch  ** while sending EOF or JSON\n")
 
     ################################################ PROPER MAIN
 
@@ -230,9 +289,7 @@ def main(par_def = None, connection_out = None):
         print(" using the dir from where the commad 'dui_server' was invoqued")
         tree_ini_path = os.getcwd()
 
-    print(
-        "\n using init path as: <<", tree_ini_path, ">> \n"
-    )
+    print("\n using init path as: <<", tree_ini_path, ">> \n")
     tree_dic_lst = iter_dict(tree_ini_path, 0)
     try:
         with open("run_data") as json_file:
@@ -256,9 +313,7 @@ def main(par_def = None, connection_out = None):
                 (HOST, PORT), ReqHandler
             ) as http_daemon:
 
-                print(
-                    "\n serving at:\n  { host:", HOST, " port:", PORT, "}\n"
-                )
+                print("\n serving at:\n  { host:", HOST, " port:", PORT, "}\n")
                 launch_success = True
 
                 connection_out.send(PORT)
@@ -274,5 +329,5 @@ def main(par_def = None, connection_out = None):
         except OSError:
             PORT += 1
             launch_success = False
-            print("OS err catch , trying again in",  n_secs, "secs")
+            print("OS err catch , trying again in", n_secs, "secs")
             time.sleep(n_secs)

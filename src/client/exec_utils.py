@@ -29,8 +29,9 @@ from client.gui_utils import AdvancedParameters, widgets_defs
 from client.init_firts import ini_data
 from shared_modules import format_utils
 
+
 def get_optional_list(cmd_str):
-    cmd = {"nod_lst":"", "cmd_lst":[cmd_str]}
+    cmd = {"nod_lst": "", "cmd_lst": [cmd_str]}
 
     data_init = ini_data()
     uni_url = data_init.get_url()
@@ -42,7 +43,7 @@ def get_optional_list(cmd_str):
 
 
 def build_advanced_params_widget(cmd_str, h_box_search):
-    cmd = {"nod_lst":"", "cmd_lst":[cmd_str]}
+    cmd = {"nod_lst": "", "cmd_lst": [cmd_str]}
 
     data_init = ini_data()
     uni_url = data_init.get_url()
@@ -59,18 +60,18 @@ def build_advanced_params_widget(cmd_str, h_box_search):
 def json_data_request(url, cmd):
     try:
         print("attempting to request to:", url, ", with:", cmd)
-        req_get = requests.get(url, stream = True, params = cmd, timeout = 3)
+        req_get = requests.get(url, stream=True, params=cmd, timeout=3)
         print("starting request")
-        str_lst = ''
-        line_str = ''
+        str_lst = ""
+        line_str = ""
         json_out = ""
         times_loop = 10
         for count_times in range(times_loop):
             print("count_times =", count_times)
             tmp_dat = req_get.raw.readline()
-            line_str = str(tmp_dat.decode('utf-8'))
-            if line_str[-7:] == '/*EOF*/':
-                print('/*EOF*/ received')
+            line_str = str(tmp_dat.decode("utf-8"))
+            if line_str[-7:] == "/*EOF*/":
+                print("/*EOF*/ received")
                 break
 
             else:
@@ -97,6 +98,7 @@ def json_data_request(url, cmd):
 class Mtz_Data_Request(QThread):
     update_progress = Signal(int)
     done_download = Signal(bytes)
+
     def __init__(self, url, cmd):
         super(Mtz_Data_Request, self).__init__()
         self.url = url
@@ -104,10 +106,8 @@ class Mtz_Data_Request(QThread):
 
     def run(self):
         try:
-            req_get = requests.get(
-                self.url, stream = True, params = self.cmd, timeout = 3
-            )
-            total_size = int(req_get.headers.get('content-length', 0)) + 1
+            req_get = requests.get(self.url, stream=True, params=self.cmd, timeout=3)
+            total_size = int(req_get.headers.get("content-length", 0)) + 1
             print("total_size =", total_size)
 
             block_size = 65536
@@ -132,9 +132,7 @@ class Mtz_Data_Request(QThread):
             mtz_data = None
 
         except requests.exceptions.RequestException:
-            print(
-                "\n requests.exceptions.RequestException (Mtz_Data_Request) \n"
-            )
+            print("\n requests.exceptions.RequestException (Mtz_Data_Request) \n")
             mtz_data = None
 
         self.done_download.emit(mtz_data)
@@ -143,20 +141,21 @@ class Mtz_Data_Request(QThread):
 class Run_n_Output(QThread):
     new_line_out = Signal(str, int, str)
     first_line = Signal(int)
+
     def __init__(self, request):
         super(Run_n_Output, self).__init__()
         self.request = request
         self.number = None
 
     def run(self):
-        line_str = ''
+        line_str = ""
         not_yet_read = True
         while True:
             tmp_dat = self.request.raw.readline()
-            line_str = str(tmp_dat.decode('utf-8'))
-            if line_str[-7:] == '/*EOF*/':
-                #TODO: consider a different Signal to say finished
-                print('>>  /*EOF*/  <<')
+            line_str = str(tmp_dat.decode("utf-8"))
+            if line_str[-7:] == "/*EOF*/":
+                # TODO: consider a different Signal to say finished
+                print(">>  /*EOF*/  <<")
                 break
 
             if not_yet_read:
@@ -179,10 +178,11 @@ class Run_n_Output(QThread):
 
 
 class CommandParamControl:
-    '''
+    """
     keeps track of command to run with parameters included
-    '''
-    def __init__(self, main_list = []):
+    """
+
+    def __init__(self, main_list=[]):
         self.m_cmd_lst = main_list
         self.par_lst = []
         for n in range(len(self.m_cmd_lst)):
@@ -190,10 +190,7 @@ class CommandParamControl:
 
         self.custm_param = None
         print("\n New 'CommandParamControl':")
-        print(
-            "(cmd, par_lst) =",
-            self.m_cmd_lst, self.par_lst, " --------- \n"
-        )
+        print("(cmd, par_lst) =", self.m_cmd_lst, self.par_lst, " --------- \n")
         print(" par_lst(__init__) =", self.par_lst)
 
     def reset_all_params(self):
@@ -206,7 +203,7 @@ class CommandParamControl:
         self.m_cmd_lst = [dials_command]
         print("\n self.m_cmd_lst  =", self.m_cmd_lst)
 
-    def set_parameter(self, new_name, new_value, lst_num = 0):
+    def set_parameter(self, new_name, new_value, lst_num=0):
         print(" par_lst(set_parameter) ini =", self.par_lst)
         already_here = False
         for single_par in self.par_lst[lst_num]:
@@ -215,7 +212,7 @@ class CommandParamControl:
                 already_here = True
 
         if not already_here:
-            self.par_lst[lst_num].append({"name":new_name, "value":new_value})
+            self.par_lst[lst_num].append({"name": new_name, "value": new_value})
 
         print(" par_lst(set_parameter) end =", self.par_lst)
 
@@ -232,10 +229,7 @@ class CommandParamControl:
                 print("inner_par_val =", inner_par_val)
                 try:
                     build_lst.append(
-                        {
-                            "name":str(inner_par_val[0]),
-                            "value":str(inner_par_val[1])
-                        }
+                        {"name": str(inner_par_val[0]), "value": str(inner_par_val[1])}
                     )
                 except IndexError:
                     print("index err catch, not adding new parameter")
@@ -257,7 +251,7 @@ class CommandParamControl:
                 max_nod_num = node["number"]
 
         self.number = max_nod_num + 1
-        self.status = 'Ready'
+        self.status = "Ready"
         self.parent_node_lst = list(parent_s)
 
     def add_or_remove_parent(self, nod_num):
@@ -295,13 +289,13 @@ class CommandParamControl:
             for str_elem in lst_par:
                 tmp_lst = str_elem.split("=")
                 inner_par_lst.append(
-                    {"name":str(tmp_lst[0]), "value":str(tmp_lst[1])}
+                    {"name": str(tmp_lst[0]), "value": str(tmp_lst[1])}
                 )
 
             self.par_lst.append(inner_par_lst)
 
         print("self.par_lst =", self.par_lst)
-        #TODO remember to handle "self.custm_param"
+        # TODO remember to handle "self.custm_param"
 
     def get_all_params(self):
         return self.par_lst[0], self.custm_param

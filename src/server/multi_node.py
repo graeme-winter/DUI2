@@ -29,54 +29,56 @@ from server.data_n_json import get_data_from_steps
 from server.init_first import ini_data
 from shared_modules import format_utils
 
+
 def get_pair_list():
     return [
-        ("d",       "display"                               ),
-        ("h",       "history"                               ),
-        ("dt",      "dir_tree"                              ),
-        ("dl",      "display_log"                           ),
-        ("cl",      "closed"                                ),
-        ("gol",     "get_optional_command_list"             ),
-        ("gr",      "get_report"                            ),
-        ("gmt",     "get_mtz"                               ),
-        ("gt",      "get_template"                          ),
-        ("gi",      "get_image"                             ),
-        ("gis",     "get_image_slice"                       ),
-        ("gmi",     "get_mask_image"                        ),
-        ("gmis",    "get_mask_image_slice"                  ),
-        ("grp",     "get_predictions"                       ),
-        ("grl",     "get_reflection_list"                   ),
-        ("gef",     "get_experiments_file"                  ),
-        ("grf",     "get_reflections_file"                  ),
-        ("gld",     "get_lambda"                            ),
-        ("gb",      "get_bravais_sum"                       ),
-        ("st",      "stop"                                  ),
-        ("fdp",     "find_spots_params"                     ),
-        ("idp",     "index_params"                          ),
-        ("rbp",     "refine_bravais_settings_params"        ),
-        ("rfp",     "refine_params"                         ),
-        ("itp",     "integrate_params"                      ),
-        ("smp",     "symmetry_params"                       ),
-        ("scp",     "scale_params"                          ),
-        ("cep",     "combine_experiments_params"            ),
-        ("ip",      "dials.import"                          ),
-        ("gm",      "dials.generate_mask"                   ),
-        ("am",      "dials.apply_mask"                      ),
-        ("fd",      "dials.find_spots"                      ),
-        ("fr",      "dials.find_rotation_axis"              ),
-        ("id",      "dials.index"                           ),
-        ("rb",      "dials.refine_bravais_settings"         ),
-        ("ri",      "dials.reindex"                         ),
-        ("rf",      "dials.refine"                          ),
-        ("it",      "dials.integrate"                       ),
-        ("sm",      "dials.symmetry"                        ),
-        ("sc",      "dials.scale"                           ),
-        ("cs",      "dials.cosym"                           ),
-        ("ss",      "dials.slice_sequence"                  ),
-        ("mg",      "dials.merge"                           ),
-        ("ce",      "dials.combine_experiments"             ),
-        ("ex",      "dials.export"                          ),
+        ("d", "display"),
+        ("h", "history"),
+        ("dt", "dir_tree"),
+        ("dl", "display_log"),
+        ("cl", "closed"),
+        ("gol", "get_optional_command_list"),
+        ("gr", "get_report"),
+        ("gmt", "get_mtz"),
+        ("gt", "get_template"),
+        ("gi", "get_image"),
+        ("gis", "get_image_slice"),
+        ("gmi", "get_mask_image"),
+        ("gmis", "get_mask_image_slice"),
+        ("grp", "get_predictions"),
+        ("grl", "get_reflection_list"),
+        ("gef", "get_experiments_file"),
+        ("grf", "get_reflections_file"),
+        ("gld", "get_lambda"),
+        ("gb", "get_bravais_sum"),
+        ("st", "stop"),
+        ("fdp", "find_spots_params"),
+        ("idp", "index_params"),
+        ("rbp", "refine_bravais_settings_params"),
+        ("rfp", "refine_params"),
+        ("itp", "integrate_params"),
+        ("smp", "symmetry_params"),
+        ("scp", "scale_params"),
+        ("cep", "combine_experiments_params"),
+        ("ip", "dials.import"),
+        ("gm", "dials.generate_mask"),
+        ("am", "dials.apply_mask"),
+        ("fd", "dials.find_spots"),
+        ("fr", "dials.find_rotation_axis"),
+        ("id", "dials.index"),
+        ("rb", "dials.refine_bravais_settings"),
+        ("ri", "dials.reindex"),
+        ("rf", "dials.refine"),
+        ("it", "dials.integrate"),
+        ("sm", "dials.symmetry"),
+        ("sc", "dials.scale"),
+        ("cs", "dials.cosym"),
+        ("ss", "dials.slice_sequence"),
+        ("mg", "dials.merge"),
+        ("ce", "dials.combine_experiments"),
+        ("ex", "dials.export"),
     ]
+
 
 def fix_alias(short_in):
     pair_list = get_pair_list()
@@ -119,7 +121,7 @@ def add_log_line(new_line, nod_req):
 
     if nod_req is not None:
         try:
-            nod_req.wfile.write(bytes(new_line , 'utf-8'))
+            nod_req.wfile.write(bytes(new_line, "utf-8"))
             Error_Broken_Pipes = 0
 
         except BrokenPipeError:
@@ -132,7 +134,7 @@ def add_log_line(new_line, nod_req):
 
 
 class CmdNode(object):
-    def __init__(self, parent_lst_in = None):
+    def __init__(self, parent_lst_in=None):
 
         data_init = ini_data()
         self.win_exe = data_init.get_win_exe()
@@ -169,10 +171,7 @@ class CmdNode(object):
                 for refl_2_add in single_parent._lst_refl_out:
                     self._lst_refl_in.append(refl_2_add)
 
-                if(
-                    single_parent.lst2run[0][0] ==
-                    "dials.refine_bravais_settings"
-                ):
+                if single_parent.lst2run[0][0] == "dials.refine_bravais_settings":
                     print("after refine_bravais_settings, adding json files")
                     lst_json = glob.glob(single_parent._run_dir + "/*.json")
                     for json_2_add in lst_json:
@@ -185,9 +184,9 @@ class CmdNode(object):
                     self._lst_refl_in += single_parent._lst_refl_in
 
         except TypeError:
-            print("parent_lst_in =", parent_lst_in, "tmp empty; ", end='')
+            print("parent_lst_in =", parent_lst_in, "tmp empty; ", end="")
 
-    def __call__(self, lst_in, req_obj = None):
+    def __call__(self, lst_in, req_obj=None):
         print("\n lst_in =", lst_in)
         self.full_cmd_lst.append([lst_in[0]])
         self.set_in_fil_n_par(lst_in)
@@ -196,20 +195,20 @@ class CmdNode(object):
         self.nod_req = req_obj
         self.run_cmd(self.nod_req)
 
-    def set_root(self, run_dir = "/tmp/tst/", lst_expt = "/tmp/tst/imported.expt"):
+    def set_root(self, run_dir="/tmp/tst/", lst_expt="/tmp/tst/imported.expt"):
         base_dir = os.getcwd()
         self.set_base_dir(base_dir)
         self._run_dir = run_dir
         self._lst_expt_in = []
         self._lst_refl_in = []
-        self.full_cmd_lst = [['Root']]
-        self.lst2run = [['dials.Root']]
+        self.full_cmd_lst = [["Root"]]
+        self.lst2run = [["dials.Root"]]
         self.status = "Succeeded"
 
-    def set_base_dir(self, dir_in = None):
-            self._base_dir = dir_in
+    def set_base_dir(self, dir_in=None):
+        self._base_dir = dir_in
 
-    def set_run_dir(self, num = None):
+    def set_run_dir(self, num=None):
         self._run_dir = self._base_dir + "/run" + str(num)
 
         print("new_dir: ", self._run_dir, "\n")
@@ -229,7 +228,7 @@ class CmdNode(object):
                 try:
                     sol_num = int(lst_in[1])
 
-                except(IndexError, ValueError):
+                except (IndexError, ValueError):
                     print(" ***  err catch  ***")
                     print(" wrong solution number, defaulting to 1")
                     sol_num = 1
@@ -268,7 +267,7 @@ class CmdNode(object):
                 self.full_cmd_lst[-1].append(par)
                 self.lst2run[-1].append(par)
 
-    def run_cmd(self, req_obj = None):
+    def run_cmd(self, req_obj=None):
         self.nod_req = req_obj
         self.status = "Busy"
         print("self.full_cmd_lst =", self.full_cmd_lst)
@@ -285,26 +284,27 @@ class CmdNode(object):
                 print("\n Running:", inner_lst, "\n")
                 self.my_proc = subprocess.Popen(
                     inner_lst,
-                    shell = False,
-                    cwd = self._run_dir,
-                    stdout = subprocess.PIPE,
-                    stderr = subprocess.STDOUT,
-                    universal_newlines = True
+                    shell=False,
+                    cwd=self._run_dir,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    universal_newlines=True,
                 )
 
             except FileNotFoundError:
-                print(
-                    "unable to run:", inner_lst[0],
-                    " <<FileNotFound err catch >> "
-                )
+                print("unable to run:", inner_lst[0], " <<FileNotFound err catch >> ")
                 self.my_proc = None
                 return
 
         else:
             print(
-                "\n\n" + "#" * 80 + "\n " + inner_lst[0] +
-                " is NOT a Dials Command, NOT Running it \n" +
-                "#" * 80 + "\n\n"
+                "\n\n"
+                + "#" * 80
+                + "\n "
+                + inner_lst[0]
+                + " is NOT a Dials Command, NOT Running it \n"
+                + "#" * 80
+                + "\n\n"
             )
             self.status = "Failed"
             return
@@ -316,21 +316,21 @@ class CmdNode(object):
         if self.nod_req is not None:
             try:
                 self.nod_req.send_response(201)
-                self.nod_req.send_header('Content-type', 'text/plain')
+                self.nod_req.send_header("Content-type", "text/plain")
                 self.nod_req.end_headers()
                 str_nod_num = "node.number=" + str(self.number) + "\n"
-                self.nod_req.wfile.write(bytes(str_nod_num , 'utf-8'))
+                self.nod_req.wfile.write(bytes(str_nod_num, "utf-8"))
 
             except BrokenPipeError:
                 print("\n << BrokenPipe err catch  >> while sending nod_num \n")
 
-        while self.my_proc.poll() is None or new_line != '':
+        while self.my_proc.poll() is None or new_line != "":
             new_line = self.my_proc.stdout.readline()
             n_Broken_Pipes += add_log_line(new_line, self.nod_req)
             log_line_lst.append(new_line[:-1])
 
         for inv_pos in range(1, len(log_line_lst)):
-            if log_line_lst[-inv_pos] != '':
+            if log_line_lst[-inv_pos] != "":
                 log_line_lst = log_line_lst[0:-inv_pos]
                 print("inv_pos =", inv_pos)
                 break
@@ -354,12 +354,12 @@ class CmdNode(object):
         lof_file.close()
 
         self._lst_expt_out = glob.glob(self._run_dir + "/*.expt")
-        #TODO reconsider if the next if is needed for failed steps
+        # TODO reconsider if the next if is needed for failed steps
         if self._lst_expt_out == []:
             self._lst_expt_out = list(self._lst_expt_in)
 
         self._lst_refl_out = glob.glob(self._run_dir + "/*.refl")
-        #TODO reconsider if the next if is needed for failed steps
+        # TODO reconsider if the next if is needed for failed steps
         if self._lst_refl_out == []:
             self._lst_refl_out = list(self._lst_refl_in)
 
@@ -379,7 +379,7 @@ class CmdNode(object):
 
         else:
             # running HTML report generation
-            rep_lst_dat_in = ['dials.report']
+            rep_lst_dat_in = ["dials.report"]
             for expt_2_add in self._lst_expt_out:
                 rep_lst_dat_in.append(expt_2_add)
 
@@ -397,19 +397,19 @@ class CmdNode(object):
 
             rep_proc = subprocess.Popen(
                 rep_lst_dat_in,
-                shell = False,
-                cwd = self._run_dir,
-                stdout = subprocess.PIPE,
-                stderr = subprocess.STDOUT,
-                universal_newlines = True
+                shell=False,
+                cwd=self._run_dir,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                universal_newlines=True,
             )
-            while rep_proc.poll() is None or new_line != '':
+            while rep_proc.poll() is None or new_line != "":
                 new_line = rep_proc.stdout.readline()
                 lst_rep_out.append(new_line)
 
             rep_proc.stdout.close()
             # in case needed there is the output of the report here:
-            #print("report stdout <<< \n", lst_rep_out, "\n >>>")
+            # print("report stdout <<< \n", lst_rep_out, "\n >>>")
 
         if os.path.exists(tmp_html_path):
             self._html_rep = tmp_html_path
@@ -421,7 +421,7 @@ class CmdNode(object):
         n_Broken_Pipes += add_log_line(new_line, self.nod_req)
 
         # running prediction generation
-        pred_lst_dat_in = ['dials.predict']
+        pred_lst_dat_in = ["dials.predict"]
         for expt_2_add in self._lst_expt_out:
             pred_lst_dat_in.append(expt_2_add)
 
@@ -436,20 +436,19 @@ class CmdNode(object):
         lst_pred_out = []
         pred_proc = subprocess.Popen(
             pred_lst_dat_in,
-            shell = False,
-            cwd = self._run_dir,
-            stdout = subprocess.PIPE,
-            stderr = subprocess.STDOUT,
-            universal_newlines = True
+            shell=False,
+            cwd=self._run_dir,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            universal_newlines=True,
         )
-        while pred_proc.poll() is None or new_line != '':
+        while pred_proc.poll() is None or new_line != "":
             new_line = pred_proc.stdout.readline()
             lst_pred_out.append(new_line)
 
         pred_proc.stdout.close()
         # in case needed there is the output of the prediction here:
-        #print("predict stdout <<< \n", lst_pred_out, "\n >>>")
-
+        # print("predict stdout <<< \n", lst_pred_out, "\n >>>")
 
         tmp_predic_path = self._run_dir + "/predicted.refl"
         if os.path.exists(tmp_predic_path):
@@ -504,12 +503,12 @@ class Runner(object):
             root_node.set_root()
             self.step_list = [root_node]
             self.bigger_lin = 0
-            #self.lst_cmd_in = []
+            # self.lst_cmd_in = []
 
         else:
             self._recover_state(recovery_data)
 
-    def run_dials_command(self, cmd_dict, req_obj = None):
+    def run_dials_command(self, cmd_dict, req_obj=None):
         unalias_cmd_lst = unalias_full_cmd(cmd_dict["cmd_lst"])
         print("\n cmd_lst: ", unalias_cmd_lst)
 
@@ -531,7 +530,7 @@ class Runner(object):
             self._save_state()
 
     def _create_step(self, prev_step_lst):
-        new_step = CmdNode(parent_lst_in = prev_step_lst)
+        new_step = CmdNode(parent_lst_in=prev_step_lst)
         tmp_big = 0
         for node in self.step_list:
             if node.number > tmp_big:
@@ -549,53 +548,53 @@ class Runner(object):
         lst_nod = []
         for uni in self.step_list:
             node = {
-                        "_base_dir"             :uni._base_dir,
-                        "full_cmd_lst"          :uni.full_cmd_lst,
-                        "lst2run"               :uni.lst2run,
-                        "_lst_expt_in"          :uni._lst_expt_in,
-                        "_lst_refl_in"          :uni._lst_refl_in,
-                        "_lst_expt_out"         :uni._lst_expt_out,
-                        "_lst_refl_out"         :uni._lst_refl_out,
-                        "_run_dir"              :uni._run_dir,
-                        "_html_rep"             :uni._html_rep,
-                        "_predic_refl"          :uni._predic_refl,
-                        "log_file_path"         :uni.log_file_path,
-                        "number"                :uni.number,
-                        "status"                :uni.status,
-                        "parent_node_lst"       :uni.parent_node_lst,
-                        "child_node_lst"        :uni.child_node_lst
+                "_base_dir": uni._base_dir,
+                "full_cmd_lst": uni.full_cmd_lst,
+                "lst2run": uni.lst2run,
+                "_lst_expt_in": uni._lst_expt_in,
+                "_lst_refl_in": uni._lst_refl_in,
+                "_lst_expt_out": uni._lst_expt_out,
+                "_lst_refl_out": uni._lst_refl_out,
+                "_run_dir": uni._run_dir,
+                "_html_rep": uni._html_rep,
+                "_predic_refl": uni._predic_refl,
+                "log_file_path": uni.log_file_path,
+                "number": uni.number,
+                "status": uni.status,
+                "parent_node_lst": uni.parent_node_lst,
+                "child_node_lst": uni.child_node_lst,
             }
             lst_nod.append(node)
 
         all_dat = {
-                "step_list"             :lst_nod,
-                "bigger_lin"            :self.bigger_lin,
+            "step_list": lst_nod,
+            "bigger_lin": self.bigger_lin,
         }
 
         with open("run_data", "w") as fp:
             json.dump(all_dat, fp, indent=4)
 
     def _recover_state(self, recovery_data):
-        self.step_list =    []
-        self.bigger_lin =   recovery_data["bigger_lin"]
+        self.step_list = []
+        self.bigger_lin = recovery_data["bigger_lin"]
 
         lst_nod = recovery_data["step_list"]
         for uni_dic in lst_nod:
             new_node = CmdNode()
-            new_node._base_dir       = uni_dic["_base_dir"]
-            new_node.full_cmd_lst    = uni_dic["full_cmd_lst"]
-            new_node.lst2run         = uni_dic["lst2run"]
-            new_node._lst_expt_in    = uni_dic["_lst_expt_in"]
-            new_node._lst_refl_in    = uni_dic["_lst_refl_in"]
-            new_node._lst_expt_out   = uni_dic["_lst_expt_out"]
-            new_node._lst_refl_out   = uni_dic["_lst_refl_out"]
-            new_node._run_dir        = uni_dic["_run_dir"]
-            new_node._html_rep       = uni_dic["_html_rep"]
-            new_node._predic_refl    = uni_dic["_predic_refl"]
-            new_node.log_file_path   = uni_dic["log_file_path"]
-            new_node.number          = uni_dic["number"]
-            new_node.status          = uni_dic["status"]
-            new_node.child_node_lst  = uni_dic["child_node_lst"]
+            new_node._base_dir = uni_dic["_base_dir"]
+            new_node.full_cmd_lst = uni_dic["full_cmd_lst"]
+            new_node.lst2run = uni_dic["lst2run"]
+            new_node._lst_expt_in = uni_dic["_lst_expt_in"]
+            new_node._lst_refl_in = uni_dic["_lst_refl_in"]
+            new_node._lst_expt_out = uni_dic["_lst_expt_out"]
+            new_node._lst_refl_out = uni_dic["_lst_refl_out"]
+            new_node._run_dir = uni_dic["_run_dir"]
+            new_node._html_rep = uni_dic["_html_rep"]
+            new_node._predic_refl = uni_dic["_predic_refl"]
+            new_node.log_file_path = uni_dic["log_file_path"]
+            new_node.number = uni_dic["number"]
+            new_node.status = uni_dic["status"]
+            new_node.child_node_lst = uni_dic["child_node_lst"]
             new_node.parent_node_lst = uni_dic["parent_node_lst"]
             self.step_list.append(new_node)
 
@@ -616,11 +615,11 @@ class Runner(object):
 
             elif uni_cmd == ["dir_tree"]:
                 str_dir_tree = json.dumps(self._dir_tree_dict)
-                byt_data = bytes(str_dir_tree.encode('utf-8'))
+                byt_data = bytes(str_dir_tree.encode("utf-8"))
                 return_list = byt_data
 
             elif uni_cmd == ["history"]:
-                #return_list = self.lst_cmd_in
+                # return_list = self.lst_cmd_in
                 print("history command is temporarily off")
 
             elif uni_cmd == ["closed"]:
@@ -628,7 +627,7 @@ class Runner(object):
                 print("received closed command")
 
             elif uni_cmd == ["stop"]:
-                #TODO: consider moving this to << run_dials_command >> (do_POST)
+                # TODO: consider moving this to << run_dials_command >> (do_POST)
                 for lin2go in cmd_dict["nod_lst"]:
                     try:
                         stat2add = self.step_list[lin2go].status
@@ -639,12 +638,12 @@ class Runner(object):
                         print("\n  err catch , wrong line not logging \n")
 
             else:
-                not_needed_for_now = '''
+                not_needed_for_now = """
                 print(
                     "running run_get_data(", uni_cmd, ", "
                     ,cmd_dict, ", ", self.step_list, ")"
                 )
-                '''
+                """
                 return_list = get_data_from_steps(uni_cmd, cmd_dict, self.step_list)
 
         return return_list
@@ -653,8 +652,7 @@ class Runner(object):
 def str2dic(cmd_str):
     print("cmd_str =", cmd_str, "\n")
 
-    cmd_dict = {"nod_lst":[],
-                "cmd_lst":[]}
+    cmd_dict = {"nod_lst": [], "cmd_lst": []}
 
     lstpar = cmd_str.split(" ")
     for single_param in lstpar:
@@ -668,7 +666,7 @@ def str2dic(cmd_str):
         print("nod_lst=", cmd_dict["nod_lst"])
 
         new_par_str = ""
-        for single_param in lstpar[len(cmd_dict["nod_lst"]):]:
+        for single_param in lstpar[len(cmd_dict["nod_lst"]) :]:
             new_par_str += single_param + " "
 
         tmp_cmd_lst = new_par_str[0:-1].split(";")
@@ -683,5 +681,3 @@ def str2dic(cmd_str):
     cmd_dict["cmd_lst"] = par_n_cmd_lst
 
     return cmd_dict
-
-

@@ -1,5 +1,5 @@
 try:
-    #from img_uploader import img_stream_py
+    # from img_uploader import img_stream_py
     from server.img_uploader import img_stream_py
 
 except ImportError:
@@ -17,11 +17,10 @@ from dxtbx.model.experiment_list import (
     InvalidExperimentListError,
 )
 
+
 def get_template_info(exp_path, img_num):
     try:
-        experiments = ExperimentListFactory.from_json_file(
-            exp_path
-        )
+        experiments = ExperimentListFactory.from_json_file(exp_path)
 
         max_img_num = 0
         for single_sweep in experiments.imagesets():
@@ -64,9 +63,14 @@ def get_template_info(exp_path, img_num):
 
 
 def list_p_arrange_exp(
-    bbox_col = None, pan_col = None, hkl_col = None, n_imgs = None,
-    num_of_imgs_lst = None, imgs_shift_lst = None, id_col = None,
-    num_of_imagesets = 1
+    bbox_col=None,
+    pan_col=None,
+    hkl_col=None,
+    n_imgs=None,
+    num_of_imgs_lst=None,
+    imgs_shift_lst=None,
+    id_col=None,
+    num_of_imagesets=1,
 ):
     print("n_imgs(list_p_arrange_exp) =", n_imgs)
     img_lst = []
@@ -88,11 +92,11 @@ def list_p_arrange_exp(
                 local_hkl = "NOT indexed"
 
         box_dat = {
-            "x"         :x_ini,
-            "y"         :y_ini,
-            "width"     :width,
-            "height"    :height,
-            "local_hkl" :local_hkl,
+            "x": x_ini,
+            "y": y_ini,
+            "width": width,
+            "height": height,
+            "local_hkl": local_hkl,
         }
         if num_of_imagesets > 1:
             add_shift = 0
@@ -112,7 +116,6 @@ def list_p_arrange_exp(
                     img_lst[ind_z_shift].append(box_dat)
 
     return img_lst
-
 
 
 def get_refl_lst(expt_path, refl_path, img_num):
@@ -161,8 +164,14 @@ def get_refl_lst(expt_path, refl_path, img_num):
                 hkl_col = None
 
             box_flat_data_lst = list_p_arrange_exp(
-                bbox_col, pan_col, hkl_col, n_imgs, num_of_imgs_lst,
-                imgs_shift_lst, id_col, num_of_imagesets
+                bbox_col,
+                pan_col,
+                hkl_col,
+                n_imgs,
+                num_of_imgs_lst,
+                imgs_shift_lst,
+                id_col,
+                num_of_imagesets,
             )
 
         try:
@@ -181,9 +190,16 @@ def get_refl_lst(expt_path, refl_path, img_num):
 
 
 def single_image_arrange_predic(
-    xyzcal_col = None, pan_col = None, hkl_col = None, n_imgs = None,
-    num_of_imgs_lst = None, imgs_shift_lst = None, id_col = None,
-    num_of_imagesets = 1, z_dept = 1, img_num = None
+    xyzcal_col=None,
+    pan_col=None,
+    hkl_col=None,
+    n_imgs=None,
+    num_of_imgs_lst=None,
+    imgs_shift_lst=None,
+    id_col=None,
+    num_of_imagesets=1,
+    z_dept=1,
+    img_num=None,
 ):
     print("z_dept(single_image_arrange_predic) =", z_dept)
     img_lst = []
@@ -206,10 +222,7 @@ def single_image_arrange_predic(
                     hkl_col[i] = "NOT indexed"
 
                 img_lst.append(
-                    {
-                        "x":x_cord, "y":y_cord,
-                        "local_hkl":local_hkl, "z_dist": z_dist
-                    }
+                    {"x": x_cord, "y": y_cord, "local_hkl": local_hkl, "z_dist": z_dist}
                 )
 
         else:
@@ -221,10 +234,7 @@ def single_image_arrange_predic(
                     hkl_col[i] = "NOT indexed"
 
                 img_lst.append(
-                    {
-                        "x":x_cord, "y":y_cord,
-                        "local_hkl":local_hkl, "z_dist": z_dist
-                    }
+                    {"x": x_cord, "y": y_cord, "local_hkl": local_hkl, "z_dist": z_dist}
                 )
 
     refl_lst = img_lst
@@ -282,18 +292,23 @@ def get_refl_pred_lst(expt_path, refl_path, img_num, z_dept):
                 hkl_col = None
 
             box_flat_data_lst = single_image_arrange_predic(
-                xyzcal_col = xyzcal_col, pan_col = pan_col, hkl_col = hkl_col,
-                n_imgs = n_imgs, num_of_imgs_lst = num_of_imgs_lst,
-                imgs_shift_lst = imgs_shift_lst, id_col = id_col,
-                num_of_imagesets = num_of_imagesets, z_dept = z_dept,
-                img_num = img_num
+                xyzcal_col=xyzcal_col,
+                pan_col=pan_col,
+                hkl_col=hkl_col,
+                n_imgs=n_imgs,
+                num_of_imgs_lst=num_of_imgs_lst,
+                imgs_shift_lst=imgs_shift_lst,
+                id_col=id_col,
+                num_of_imagesets=num_of_imagesets,
+                z_dept=z_dept,
+                img_num=img_num,
             )
 
         return box_flat_data_lst
 
     except KeyError:
         print("NOT found << xyzcal_col >> col")
-        return [ [] ]
+        return [[]]
 
 
 def get_correct_img_num_n_sweep_num(experiments, img_num):
@@ -315,6 +330,7 @@ def get_correct_img_num_n_sweep_num(experiments, img_num):
     print("geting image #", on_sweep_img_num, "from sweep #", n_sweep)
     return on_sweep_img_num, n_sweep
 
+
 def get_json_w_img_2d(experiments_list_path, img_num):
     pan_num = 0
     print("experiments_list_path, img_num:", experiments_list_path, img_num)
@@ -322,9 +338,7 @@ def get_json_w_img_2d(experiments_list_path, img_num):
     print("importing from:", experiments_path)
     experiments = ExperimentListFactory.from_json_file(experiments_path)
 
-    on_sweep_img_num, n_sweep = get_correct_img_num_n_sweep_num(
-        experiments, img_num
-    )
+    on_sweep_img_num, n_sweep = get_correct_img_num_n_sweep_num(experiments, img_num)
 
     my_sweep = experiments.imagesets()[n_sweep]
     data_xy_flex = my_sweep.get_raw_data(on_sweep_img_num)[pan_num].as_double()
@@ -334,13 +348,15 @@ def get_json_w_img_2d(experiments_list_path, img_num):
     d1 = np_arr.shape[0]
     d2 = np_arr.shape[1]
     str_tup = str(tuple(np_arr.ravel()))
-    str_data = "{\"d1\":" + str(d1) + ",\"d2\":" + str(d2) \
-             + ",\"str_data\":\"" + str_tup[1:-1] + "\"}"
+    str_data = (
+        '{"d1":' + str(d1) + ',"d2":' + str(d2) + ',"str_data":"' + str_tup[1:-1] + '"}'
+    )
 
     end_tm = time.time()
     print("str/tuple use and compressing took ", end_tm - start_tm)
 
     return str_data
+
 
 def get_json_w_mask_img_2d(experiments_list_path, img_num):
     print("experiments_list_path, img_num:", experiments_list_path, img_num)
@@ -349,9 +365,7 @@ def get_json_w_mask_img_2d(experiments_list_path, img_num):
     print("importing from:", experiments_path)
     experiments = ExperimentListFactory.from_json_file(experiments_path)
 
-    on_sweep_img_num, n_sweep = get_correct_img_num_n_sweep_num(
-        experiments, img_num
-    )
+    on_sweep_img_num, n_sweep = get_correct_img_num_n_sweep_num(experiments, img_num)
 
     try:
         imageset_tmp = experiments.imagesets()[n_sweep]
@@ -367,27 +381,27 @@ def get_json_w_mask_img_2d(experiments_list_path, img_num):
 
     return str_data
 
-def get_json_w_2d_slise(
-    experiments_list_path, img_num, inv_scale, x1, y1, x2, y2
-):
+
+def get_json_w_2d_slise(experiments_list_path, img_num, inv_scale, x1, y1, x2, y2):
     print("experiments_list_path, img_num:", experiments_list_path, img_num)
     pan_num = 0
     experiments_path = experiments_list_path[0]
     print("importing from:", experiments_path)
     experiments = ExperimentListFactory.from_json_file(experiments_path)
 
-    on_sweep_img_num, n_sweep = get_correct_img_num_n_sweep_num(
-        experiments, img_num
-    )
+    on_sweep_img_num, n_sweep = get_correct_img_num_n_sweep_num(experiments, img_num)
 
     my_sweep = experiments.imagesets()[n_sweep]
     data_xy_flex = my_sweep.get_raw_data(on_sweep_img_num)[pan_num].as_double()
 
     start_tm = time.time()
     str_data = img_stream_py.slice_arr_2_str(
-        data_xy_flex, inv_scale,
-        int(float(x1)), int(float(y1)),
-        int(float(x2)), int(float(y2))
+        data_xy_flex,
+        inv_scale,
+        int(float(x1)),
+        int(float(y1)),
+        int(float(x2)),
+        int(float(y2)),
     )
     end_tm = time.time()
     print("Getting scaled slice of image took: ", end_tm - start_tm)
@@ -399,18 +413,14 @@ def get_json_w_2d_slise(
     return str_data
 
 
-def get_json_w_2d_mask_slise(
-    experiments_list_path, img_num, inv_scale, x1, y1, x2, y2
-):
+def get_json_w_2d_mask_slise(experiments_list_path, img_num, inv_scale, x1, y1, x2, y2):
     print("experiments_list_path, img_num:", experiments_list_path, img_num)
     pan_num = 0
     experiments_path = experiments_list_path[0]
     print("importing from:", experiments_path)
     experiments = ExperimentListFactory.from_json_file(experiments_path)
 
-    on_sweep_img_num, n_sweep = get_correct_img_num_n_sweep_num(
-        experiments, img_num
-    )
+    on_sweep_img_num, n_sweep = get_correct_img_num_n_sweep_num(experiments, img_num)
 
     imageset_tmp = experiments.imagesets()[n_sweep]
     mask_file = imageset_tmp.external_lookup.mask.filename
@@ -423,9 +433,12 @@ def get_json_w_2d_mask_slise(
 
         start_tm = time.time()
         str_data = img_stream_py.slice_mask_2_str(
-            mask_flex, inv_scale,
-            int(float(x1)), int(float(y1)),
-            int(float(x2)), int(float(y2))
+            mask_flex,
+            inv_scale,
+            int(float(x1)),
+            int(float(y1)),
+            int(float(x2)),
+            int(float(y2)),
         )
         end_tm = time.time()
         print("Getting scaled slice of mask took ", end_tm - start_tm)
@@ -438,7 +451,3 @@ def get_json_w_2d_mask_slise(
         str_data = None
 
     return str_data
-
-
-
-

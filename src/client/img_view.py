@@ -36,17 +36,20 @@ from client.exec_utils import json_data_request
 from client.outputs import HandleLoadStatusLabel
 
 from client.img_view_utils import (
-    crunch_min_max, np2bmp_monocrome, np2bmp_heat, np2bmp_mask,
-    load_img_json_w_str, load_mask_img_json_w_str
+    crunch_min_max,
+    np2bmp_monocrome,
+    np2bmp_heat,
+    np2bmp_mask,
+    load_img_json_w_str,
+    load_mask_img_json_w_str,
 )
 from client.simpler_param_widgets import FileBrowser, build_template
 
+
 class LoadFullMaskImage(QThread):
     image_loaded = Signal(tuple)
-    def __init__(
-        self, unit_URL = None, cur_nod_num = None,
-        cur_img_num = None, path_in = None
-    ):
+
+    def __init__(self, unit_URL=None, cur_nod_num=None, cur_img_num=None, path_in=None):
         super(LoadFullMaskImage, self).__init__()
         self.uni_url = unit_URL
         self.cur_nod_num = cur_nod_num
@@ -57,53 +60,68 @@ class LoadFullMaskImage(QThread):
         print("loading full image ", self.cur_img_num, " in full resolution")
         np_full_img = load_mask_img_json_w_str(
             self.uni_url,
-            nod_num_lst = [self.cur_nod_num],
-            img_num = self.cur_img_num,
-            exp_path = self.exp_path
+            nod_num_lst=[self.cur_nod_num],
+            img_num=self.cur_img_num,
+            exp_path=self.exp_path,
         )
-        self.image_loaded.emit(
-            (self.cur_nod_num, self.cur_img_num, np_full_img)
-        )
+        self.image_loaded.emit((self.cur_nod_num, self.cur_img_num, np_full_img))
 
 
 class LoadSliceMaskImage(QThread):
     progressing = Signal(int)
     slice_loaded = Signal(dict)
+
     def __init__(
-        self, unit_URL = None, nod_num_lst = None,
-        img_num = None, inv_scale = None,
-        x1 = None, y1 = None, x2 = None, y2 = None,
-        path_in = None
+        self,
+        unit_URL=None,
+        nod_num_lst=None,
+        img_num=None,
+        inv_scale=None,
+        x1=None,
+        y1=None,
+        x2=None,
+        y2=None,
+        path_in=None,
     ):
         super(LoadSliceMaskImage, self).__init__()
-        self.uni_url =      unit_URL
-        self.nod_num_lst =  nod_num_lst
-        self.img_num =      img_num
-        self.inv_scale =    inv_scale
-        self.x1 =           x1
-        self.y1 =           y1
-        self.x2 =           x2
-        self.y2 =           y2
-        self.exp_path =     path_in
+        self.uni_url = unit_URL
+        self.nod_num_lst = nod_num_lst
+        self.img_num = img_num
+        self.inv_scale = inv_scale
+        self.x1 = x1
+        self.y1 = y1
+        self.x2 = x2
+        self.y2 = y2
+        self.exp_path = path_in
 
     def run(self):
         print("loading mask slice of image ")
 
         my_cmd_lst = [
-            "gmis " + str(self.img_num) +
-            " inv_scale=" + str(self.inv_scale) +
-            " view_rect=" + str(self.x1) + "," + str(self.y1) +
-                      "," + str(self.x2) + "," + str(self.y2)
+            "gmis "
+            + str(self.img_num)
+            + " inv_scale="
+            + str(self.inv_scale)
+            + " view_rect="
+            + str(self.x1)
+            + ","
+            + str(self.y1)
+            + ","
+            + str(self.x2)
+            + ","
+            + str(self.y2)
         ]
 
-        my_cmd = {"nod_lst" : self.nod_num_lst,
-                  "path"    : self.exp_path,
-                  "cmd_lst" : my_cmd_lst}
+        my_cmd = {
+            "nod_lst": self.nod_num_lst,
+            "path": self.exp_path,
+            "cmd_lst": my_cmd_lst,
+        }
         start_tm = time.time()
 
         try:
-            req_get = requests.get(self.uni_url, stream=True, params = my_cmd)
-            total_size = int(req_get.headers.get('content-length', 0)) + 1
+            req_get = requests.get(self.uni_url, stream=True, params=my_cmd)
+            total_size = int(req_get.headers.get("content-length", 0)) + 1
             print("total_size =", total_size)
             block_size = 65536
             downloaded_size = 0
@@ -125,7 +143,7 @@ class LoadSliceMaskImage(QThread):
             print("d1, d2 =", d1, d2)
 
             n_tup = tuple(str_data)
-            arr_1d = np.asarray(n_tup, dtype = 'float')
+            arr_1d = np.asarray(n_tup, dtype="float")
 
             np_array_out = arr_1d.reshape(d1, d2)
 
@@ -144,29 +162,25 @@ class LoadSliceMaskImage(QThread):
             np_array_out = None
 
         except json.decoder.JSONDecodeError:
-            print(
-                "\n json.decoder.JSONDecode err catch (load_slice_mask_img_json) \n"
-            )
+            print("\n json.decoder.JSONDecode err catch (load_slice_mask_img_json) \n")
             np_array_out = None
 
         self.slice_loaded.emit(
             {
-                "slice_image" :  np_array_out,
-                "inv_scale"   :  self.inv_scale,
-                "x1"          :  self.x1,
-                "y1"          :  self.y1,
-                "x2"          :  self.x2,
-                "y2"          :  self.y2
+                "slice_image": np_array_out,
+                "inv_scale": self.inv_scale,
+                "x1": self.x1,
+                "y1": self.y1,
+                "x2": self.x2,
+                "y2": self.y2,
             }
         )
 
 
 class LoadFullImage(QThread):
     image_loaded = Signal(tuple)
-    def __init__(
-        self, unit_URL = None, cur_nod_num = None,
-        cur_img_num = None, path_in = None
-    ):
+
+    def __init__(self, unit_URL=None, cur_nod_num=None, cur_img_num=None, path_in=None):
         super(LoadFullImage, self).__init__()
         self.uni_url = unit_URL
         self.cur_nod_num = cur_nod_num
@@ -177,53 +191,68 @@ class LoadFullImage(QThread):
         print("loading image ", self.cur_img_num, " in full resolution")
         np_full_img = load_img_json_w_str(
             self.uni_url,
-            nod_num_lst = [self.cur_nod_num],
-            img_num = self.cur_img_num,
-            exp_path = self.exp_path
+            nod_num_lst=[self.cur_nod_num],
+            img_num=self.cur_img_num,
+            exp_path=self.exp_path,
         )
-        self.image_loaded.emit(
-            (self.cur_nod_num, self.cur_img_num, np_full_img)
-        )
+        self.image_loaded.emit((self.cur_nod_num, self.cur_img_num, np_full_img))
 
 
 class LoadSliceImage(QThread):
     progressing = Signal(int)
     slice_loaded = Signal(dict)
+
     def __init__(
-        self, unit_URL = None, nod_num_lst = None,
-        img_num = None, inv_scale = None,
-        x1 = None, y1 = None, x2 = None, y2 = None,
-        path_in = None
+        self,
+        unit_URL=None,
+        nod_num_lst=None,
+        img_num=None,
+        inv_scale=None,
+        x1=None,
+        y1=None,
+        x2=None,
+        y2=None,
+        path_in=None,
     ):
         super(LoadSliceImage, self).__init__()
-        self.uni_url =      unit_URL
-        self.nod_num_lst =  nod_num_lst
-        self.img_num =      img_num
-        self.inv_scale =    inv_scale
-        self.x1 =           x1
-        self.y1 =           y1
-        self.x2 =           x2
-        self.y2 =           y2
-        self.exp_path =     path_in
+        self.uni_url = unit_URL
+        self.nod_num_lst = nod_num_lst
+        self.img_num = img_num
+        self.inv_scale = inv_scale
+        self.x1 = x1
+        self.y1 = y1
+        self.x2 = x2
+        self.y2 = y2
+        self.exp_path = path_in
 
     def run(self):
         print("loading slice of image ")
 
         my_cmd_lst = [
-            "gis " + str(self.img_num) +
-            " inv_scale=" + str(self.inv_scale) +
-            " view_rect=" + str(self.x1) + "," + str(self.y1) +
-                      "," + str(self.x2) + "," + str(self.y2)
+            "gis "
+            + str(self.img_num)
+            + " inv_scale="
+            + str(self.inv_scale)
+            + " view_rect="
+            + str(self.x1)
+            + ","
+            + str(self.y1)
+            + ","
+            + str(self.x2)
+            + ","
+            + str(self.y2)
         ]
 
-        my_cmd = {"nod_lst" : self.nod_num_lst,
-                  "path"    : self.exp_path,
-                  "cmd_lst" : my_cmd_lst}
+        my_cmd = {
+            "nod_lst": self.nod_num_lst,
+            "path": self.exp_path,
+            "cmd_lst": my_cmd_lst,
+        }
         start_tm = time.time()
 
         try:
-            req_get = requests.get(self.uni_url, stream=True, params = my_cmd)
-            total_size = int(req_get.headers.get('content-length', 0)) + 1
+            req_get = requests.get(self.uni_url, stream=True, params=my_cmd)
+            total_size = int(req_get.headers.get("content-length", 0)) + 1
             print("total_size =", total_size)
             block_size = 65536
             downloaded_size = 0
@@ -243,7 +272,7 @@ class LoadSliceImage(QThread):
             d1 = arr_dic["d1"]
             d2 = arr_dic["d2"]
             print("d1, d2 =", d1, d2)
-            arr_1d = np.fromstring(str_data, dtype = float, sep = ',')
+            arr_1d = np.fromstring(str_data, dtype=float, sep=",")
             np_array_out = arr_1d.reshape(d1, d2)
 
         except zlib.error:
@@ -255,25 +284,21 @@ class LoadSliceImage(QThread):
             np_array_out = None
 
         except requests.exceptions.RequestException:
-            print(
-                "\n requests.exceptions.RequestException (load_slice_img_json) \n"
-            )
+            print("\n requests.exceptions.RequestException (load_slice_img_json) \n")
             np_array_out = None
 
         except json.decoder.JSONDecodeError:
-            print(
-                "\n json.decoder.JSONDecode err catch (load_slice_img_json) \n"
-            )
+            print("\n json.decoder.JSONDecode err catch (load_slice_img_json) \n")
             np_array_out = None
 
         self.slice_loaded.emit(
             {
-                "slice_image" :  np_array_out,
-                "inv_scale"   :  self.inv_scale,
-                "x1"          :  self.x1,
-                "y1"          :  self.y1,
-                "x2"          :  self.x2,
-                "y2"          :  self.y2
+                "slice_image": np_array_out,
+                "inv_scale": self.inv_scale,
+                "x1": self.x1,
+                "y1": self.y1,
+                "x2": self.x2,
+                "y2": self.y2,
             }
         )
 
@@ -284,16 +309,13 @@ class ImgGraphicsScene(QGraphicsScene):
     mouse_pressed = Signal(int, int)
     mouse_released = Signal(int, int)
 
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(ImgGraphicsScene, self).__init__(parent)
         self.parent_obj = parent
         self.curr_pixmap = None
         self.my_mask_pix_map = None
 
-        self.overlay_pen = QPen(
-            Qt.white, 0.8, Qt.SolidLine,
-            Qt.RoundCap, Qt.RoundJoin
-        )
+        self.overlay_pen = QPen(Qt.white, 0.8, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin)
         self.draw_all_hkl = False
         self.draw_near_hkl = True
 
@@ -305,9 +327,7 @@ class ImgGraphicsScene(QGraphicsScene):
         self.addPixmap(self.curr_pixmap)
         if self.parent_obj.pop_display_menu.rad_but_obs.isChecked():
             for refl in self.refl_list:
-                rectangle = QRectF(
-                    refl["x"], refl["y"], refl["width"], refl["height"]
-                )
+                rectangle = QRectF(refl["x"], refl["y"], refl["width"], refl["height"])
                 self.addRect(rectangle, self.overlay_pen)
 
         else:
@@ -316,14 +336,18 @@ class ImgGraphicsScene(QGraphicsScene):
             for refl in self.refl_list:
                 paint_size = max_size - 4.0 * refl["z_dist"] / z_dept_fl
                 self.addLine(
-                    refl["x"], refl["y"] - paint_size,
-                    refl["x"], refl["y"] + paint_size,
-                    self.overlay_pen
+                    refl["x"],
+                    refl["y"] - paint_size,
+                    refl["x"],
+                    refl["y"] + paint_size,
+                    self.overlay_pen,
                 )
                 self.addLine(
-                    refl["x"] + paint_size, refl["y"],
-                    refl["x"] - paint_size, refl["y"],
-                    self.overlay_pen
+                    refl["x"] + paint_size,
+                    refl["y"],
+                    refl["x"] - paint_size,
+                    refl["y"],
+                    self.overlay_pen,
                 )
 
         if self.my_mask_pix_map is not None:
@@ -344,39 +368,41 @@ class ImgGraphicsScene(QGraphicsScene):
                     except ValueError:
                         pass
 
-                if pict[0] == 'untrusted.rectangle':
+                if pict[0] == "untrusted.rectangle":
                     tmp_width = lst_num[1] - lst_num[0]
                     tmp_height = lst_num[3] - lst_num[2]
-                    rectangle = QRectF(
-                        lst_num[0], lst_num[2], tmp_width, tmp_height
-                    )
+                    rectangle = QRectF(lst_num[0], lst_num[2], tmp_width, tmp_height)
                     self.addRect(rectangle, self.overlay_pen)
 
-                elif pict[0] == 'untrusted.circle':
+                elif pict[0] == "untrusted.circle":
                     rectangle = QRectF(
-                        lst_num[0] - lst_num[2], lst_num[1] - lst_num[2],
-                        2 * lst_num[2], 2 * lst_num[2]
+                        lst_num[0] - lst_num[2],
+                        lst_num[1] - lst_num[2],
+                        2 * lst_num[2],
+                        2 * lst_num[2],
                     )
                     self.addEllipse(rectangle, self.overlay_pen)
 
-                elif pict[0] == 'untrusted.polygon':
+                elif pict[0] == "untrusted.polygon":
                     siz_n_blk = (len(lst_num) - 2) / 2
                     if siz_n_blk >= 1:
                         for i in range(int(siz_n_blk)):
                             self.addLine(
-                                lst_num[i * 2], lst_num[i * 2 + 1],
-                                lst_num[i * 2 + 2], lst_num[i * 2 + 3],
-                                self.overlay_pen
+                                lst_num[i * 2],
+                                lst_num[i * 2 + 1],
+                                lst_num[i * 2 + 2],
+                                lst_num[i * 2 + 3],
+                                self.overlay_pen,
                             )
 
         except TypeError:
             pass
 
     def __call__(self, new_pixmap, refl_list1, new_temp_mask):
-        bkp_in_case = '''
+        bkp_in_case = """
     def __call__(self, new_pixmap, refl_list0, new_temp_mask):
         self.refl_list = refl_list0
-        '''
+        """
         self.refl_list = refl_list1
         if self.parent_obj.palette == "heat":
             overlay_colour = Qt.green
@@ -391,8 +417,7 @@ class ImgGraphicsScene(QGraphicsScene):
             overlay_colour = Qt.blue
 
         self.overlay_pen = QPen(
-            overlay_colour, 0.8, Qt.SolidLine,
-            Qt.RoundCap, Qt.RoundJoin
+            overlay_colour, 0.8, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin
         )
         self.temp_mask = new_temp_mask
         self.my_pix_map = new_pixmap
@@ -422,10 +447,10 @@ class ImgGraphicsScene(QGraphicsScene):
                 pos_min = None
                 d_cuad_min = 10000000
                 for num, refl in enumerate(self.refl_list):
-                    '''
+                    """
                     x_ref = refl["x"] + refl["width"] / 2
                     y_ref = refl["y"] + refl["height"] / 2
-                    '''
+                    """
                     x_ref = refl["x"]
                     y_ref = refl["y"]
 
@@ -443,12 +468,12 @@ class ImgGraphicsScene(QGraphicsScene):
                 n_text.setPen(self.overlay_pen)
 
             except (UnboundLocalError, TypeError, AttributeError):
-                prints_to_console_for_debugging = '''
+                prints_to_console_for_debugging = """
                 print(
                     "not found the nearer reflection " +
                     "or not existent reflection list yet"
                 )
-                '''
+                """
                 pass
 
         self.new_mouse_pos.emit(x_pos, y_pos)
@@ -469,6 +494,7 @@ class PopDisplayMenu(QMenu):
     new_palette = Signal(str)
     new_redraw = Signal()
     new_ref_list = Signal()
+
     def __init__(self, parent=None):
         super().__init__()
         self.my_parent = parent
@@ -479,7 +505,6 @@ class PopDisplayMenu(QMenu):
 
         palette_group = QGroupBox("Palette tuning")
         palette_box_layout = QVBoxLayout()
-
 
         self.i_min_line = QLineEdit(str(self.i_min))
         self.i_min_line.textChanged.connect(self.i_min_changed)
@@ -499,9 +524,7 @@ class PopDisplayMenu(QMenu):
             if plt == self.palette:
                 self.palette_select.setCurrentIndex(n)
 
-        self.palette_select.currentIndexChanged.connect(
-            self.palette_changed_by_user
-        )
+        self.palette_select.currentIndexChanged.connect(self.palette_changed_by_user)
 
         palette_box_layout.addWidget(QLabel("  ... "))
         palette_box_layout.addWidget(self.palette_select)
@@ -570,7 +593,6 @@ class PopDisplayMenu(QMenu):
         print("new_ref_list")
         self.new_ref_list.emit()
 
-
     def palette_changed_by_user(self, new_palette_num):
         self.palette = self.palette_lst[new_palette_num]
         print("self.palette =", self.palette)
@@ -597,27 +619,23 @@ class PopDisplayMenu(QMenu):
 
 class LoadInThread(QThread):
     request_loaded = Signal(tuple)
-    def __init__(
-        self, unit_URL = None, cmd_in = None
-    ):
+
+    def __init__(self, unit_URL=None, cmd_in=None):
         super(LoadInThread, self).__init__()
         self.uni_url = unit_URL
         self.cmd = cmd_in
 
     def run(self):
         print("\n Loading with QThread ... Start", self.cmd, " \n")
-        response = json_data_request(
-            self.uni_url, self.cmd
-        )
-        self.request_loaded.emit(
-            (response)
-        )
+        response = json_data_request(self.uni_url, self.cmd)
+        self.request_loaded.emit((response))
         print("\n Loading with QThread ... End ", self.cmd, " \n")
 
 
 class DoImageView(QObject):
     new_mask_comp = Signal(dict)
-    def __init__(self, parent = None):
+
+    def __init__(self, parent=None):
         super(DoImageView, self).__init__(parent)
         self.main_obj = parent
 
@@ -632,15 +650,9 @@ class DoImageView(QObject):
         self.set_drag_mode()
         self.set_mask_comp()
 
-        self.main_obj.window.ScaleOneOneButton.clicked.connect(
-            self.OneOneScale
-        )
-        self.main_obj.window.ZoomInButton.clicked.connect(
-            self.ZoomInScale
-        )
-        self.main_obj.window.ZoomOutButton.clicked.connect(
-            self.ZoomOutScale
-        )
+        self.main_obj.window.ScaleOneOneButton.clicked.connect(self.OneOneScale)
+        self.main_obj.window.ZoomInButton.clicked.connect(self.ZoomInScale)
+        self.main_obj.window.ZoomOutButton.clicked.connect(self.ZoomOutScale)
 
         self.main_obj.window.EasterEggButton.clicked.connect(self.easter_egg)
 
@@ -661,9 +673,7 @@ class DoImageView(QObject):
         self.pop_display_menu.new_palette.connect(self.change_palette)
         self.pop_display_menu.new_redraw.connect(self.refresh_pixel_map)
 
-        self.pop_display_menu.new_ref_list.connect(
-            self.request_reflection_list
-        )
+        self.pop_display_menu.new_ref_list.connect(self.request_reflection_list)
 
         self.my_scene.img_scale.connect(self.scale_img)
         self.my_scene.new_mouse_pos.connect(self.on_mouse_move)
@@ -709,9 +719,11 @@ class DoImageView(QObject):
             self.exp_path = str(self.cur_nod_num)
 
         my_cmd_lst = ["get_template " + str(in_img_num)]
-        my_cmd = {"nod_lst" : [self.cur_nod_num],
-                  "path"    : self.nod_or_path,
-                  "cmd_lst" : my_cmd_lst}
+        my_cmd = {
+            "nod_lst": [self.cur_nod_num],
+            "path": self.nod_or_path,
+            "cmd_lst": my_cmd_lst,
+        }
 
         try:
             self.ld_tpl_thread.quit()
@@ -721,9 +733,7 @@ class DoImageView(QObject):
             print("first reflection list loading")
 
         self.ld_tpl_thread = LoadInThread(self.uni_url, my_cmd)
-        self.ld_tpl_thread.request_loaded.connect(
-            self.after_requesting_template
-        )
+        self.ld_tpl_thread.request_loaded.connect(self.after_requesting_template)
         self.ld_tpl_thread.start()
 
     def after_requesting_template(self, tup_data):
@@ -733,30 +743,22 @@ class DoImageView(QObject):
             self.cur_img_num = int(json_data_lst[4])
             self.main_obj.window.ImgNumEdit.setText(str(self.cur_img_num))
             print("new_templ = ", new_templ)
-            self.img_d1_d2 = (
-                json_data_lst[1], json_data_lst[2]
-            )
+            self.img_d1_d2 = (json_data_lst[1], json_data_lst[2])
             new_img_path = str(json_data_lst[3])
             if self.img_path != new_img_path:
                 x_ax = np.arange(
-                    start = -self.img_d1_d2[1] / 2,
-                    stop = self.img_d1_d2[1] / 2 + 1,
-                    step = 1
+                    start=-self.img_d1_d2[1] / 2, stop=self.img_d1_d2[1] / 2 + 1, step=1
                 )
                 y_ax = np.arange(
-                    start = -self.img_d1_d2[0] / 2,
-                    stop = self.img_d1_d2[0] / 2 + 1,
-                    step = 1
+                    start=-self.img_d1_d2[0] / 2, stop=self.img_d1_d2[0] / 2 + 1, step=1
                 )
                 sx = x_ax * x_ax
                 sy = y_ax * y_ax
-                xx, yy = np.meshgrid(sx, sy, sparse = True)
+                xx, yy = np.meshgrid(sx, sy, sparse=True)
                 tmp_2d_arr = xx + yy
                 tmp_2d_arr = tmp_2d_arr.max() - tmp_2d_arr
-                tmp_2d_arr = tmp_2d_arr ** 6
-                self.np_full_img = self.i_min_max[1] * (
-                    tmp_2d_arr / tmp_2d_arr.max()
-                )
+                tmp_2d_arr = tmp_2d_arr**6
+                self.np_full_img = self.i_min_max[1] * (tmp_2d_arr / tmp_2d_arr.max())
             self.img_path = new_img_path
             self.main_obj.window.ImagePathText.setText(str(self.img_path))
             print("New Img Num = ", json_data_lst[4])
@@ -765,10 +767,10 @@ class DoImageView(QObject):
             print("Not loaded new template in full")
 
         try:
-            self.np_full_mask_img = np.ones((
-                self.img_d1_d2[0], self.img_d1_d2[1]
-                ), dtype = 'float')
-            self.np_full_mask_img[:,:] = 1.0
+            self.np_full_mask_img = np.ones(
+                (self.img_d1_d2[0], self.img_d1_d2[1]), dtype="float"
+            )
+            self.np_full_mask_img[:, :] = 1.0
 
         except TypeError:
             self.np_full_mask_img = None
@@ -777,31 +779,31 @@ class DoImageView(QObject):
 
     def request_reflection_list(self):
         print(
-            "refreshing Image Viewer\n img:", self.cur_img_num,
-            "\n node in List:", self.nod_or_path
+            "refreshing Image Viewer\n img:",
+            self.cur_img_num,
+            "\n node in List:",
+            self.nod_or_path,
         )
         if self.nod_or_path is True:
             if self.pop_display_menu.rad_but_obs.isChecked():
                 my_cmd = {
-                    'nod_lst': [self.cur_nod_num], 'cmd_lst': [
-                        "grl " + str(self.cur_img_num)
-                    ]
+                    "nod_lst": [self.cur_nod_num],
+                    "cmd_lst": ["grl " + str(self.cur_img_num)],
                 }
 
             else:
                 z_dept_str = str(self.pop_display_menu.z_dept_combo.value())
                 my_cmd = {
-                    'nod_lst': [self.cur_nod_num],
-                    'cmd_lst': [
-                        "grp " + str(self.cur_img_num) +
-                        " z_dept=" + z_dept_str
-                    ]
+                    "nod_lst": [self.cur_nod_num],
+                    "cmd_lst": [
+                        "grp " + str(self.cur_img_num) + " z_dept=" + z_dept_str
+                    ],
                 }
 
         elif type(self.nod_or_path) is str:
             my_cmd = {
-                'path': self.nod_or_path,
-                'cmd_lst': "get_reflection_list " + str(self.cur_img_num)
+                "path": self.nod_or_path,
+                "cmd_lst": "get_reflection_list " + str(self.cur_img_num),
             }
 
         elif self.nod_or_path is False:
@@ -822,9 +824,7 @@ class DoImageView(QObject):
 
             self.ld_ref_thread = LoadInThread(self.uni_url, my_cmd)
             if self.pop_display_menu.rad_but_obs.isChecked():
-                self.ld_ref_thread.request_loaded.connect(
-                    self.after_requesting_ref_lst
-                )
+                self.ld_ref_thread.request_loaded.connect(self.after_requesting_ref_lst)
 
             else:
                 self.ld_ref_thread.request_loaded.connect(
@@ -840,11 +840,11 @@ class DoImageView(QObject):
             for inner_dict in json_lst:
                 self.r_list0.append(
                     {
-                        "x"         : float(inner_dict["x"]),
-                        "y"         : float(inner_dict["y"]),
-                        "width"     : float(inner_dict["width"]),
-                        "height"    : float(inner_dict["height"]),
-                        "local_hkl" :   str(inner_dict["local_hkl"]),
+                        "x": float(inner_dict["x"]),
+                        "y": float(inner_dict["y"]),
+                        "width": float(inner_dict["width"]),
+                        "height": float(inner_dict["height"]),
+                        "local_hkl": str(inner_dict["local_hkl"]),
                     }
                 )
 
@@ -863,10 +863,10 @@ class DoImageView(QObject):
             for inner_dict in json_lst:
                 self.r_list1.append(
                     {
-                        "x"         : float(inner_dict["x"]),
-                        "y"         : float(inner_dict["y"]),
-                        "local_hkl" :   str(inner_dict["local_hkl"]),
-                        "z_dist"    : float(inner_dict["z_dist"]),
+                        "x": float(inner_dict["x"]),
+                        "y": float(inner_dict["y"]),
+                        "local_hkl": str(inner_dict["local_hkl"]),
+                        "z_dist": float(inner_dict["z_dist"]),
                     }
                 )
 
@@ -886,69 +886,57 @@ class DoImageView(QObject):
     def refresh_pixel_map(self):
         show_refl = self.pop_display_menu.chk_box_show.isChecked()
         print("show_refl =", show_refl)
-        self.my_scene.draw_all_hkl = \
-            self.pop_display_menu.rad_but_all_hkl.isChecked()
-        self.my_scene.draw_near_hkl = \
-            self.pop_display_menu.rad_but_near_hkl.isChecked()
+        self.my_scene.draw_all_hkl = self.pop_display_menu.rad_but_all_hkl.isChecked()
+        self.my_scene.draw_near_hkl = self.pop_display_menu.rad_but_near_hkl.isChecked()
 
         try:
             if self.palette == "heat":
                 rgb_np = self.bmp_heat.img_2d_rgb(
-                    data2d = self.np_full_img, invert = False,
-                    i_min_max = self.i_min_max
+                    data2d=self.np_full_img, invert=False, i_min_max=self.i_min_max
                 )
 
             elif self.palette == "grayscale":
                 rgb_np = self.bmp_m_cro.img_2d_rgb(
-                    data2d = self.np_full_img, invert = False,
-                    i_min_max = self.i_min_max
+                    data2d=self.np_full_img, invert=False, i_min_max=self.i_min_max
                 )
 
             elif self.palette == "heat invert":
                 rgb_np = self.bmp_heat.img_2d_rgb(
-                    data2d = self.np_full_img, invert = True,
-                    i_min_max = self.i_min_max
+                    data2d=self.np_full_img, invert=True, i_min_max=self.i_min_max
                 )
 
             elif self.palette == "invert":
                 rgb_np = self.bmp_m_cro.img_2d_rgb(
-                    data2d = self.np_full_img, invert = True,
-                    i_min_max = self.i_min_max
+                    data2d=self.np_full_img, invert=True, i_min_max=self.i_min_max
                 )
 
             q_img = QImage(
                 rgb_np.data,
                 np.size(rgb_np[0:1, :, 0:1]),
                 np.size(rgb_np[:, 0:1, 0:1]),
-                QImage.Format_ARGB32
+                QImage.Format_ARGB32,
             )
             new_pixmap = QPixmap.fromImage(q_img)
             if show_refl:
                 if self.pop_display_menu.rad_but_obs.isChecked():
-                    self.my_scene(
-                        new_pixmap, self.r_list0, self.list_temp_mask
-                    )
+                    self.my_scene(new_pixmap, self.r_list0, self.list_temp_mask)
 
                 else:
-                    self.my_scene(
-                        new_pixmap, self.r_list1, self.list_temp_mask
-                    )
+                    self.my_scene(new_pixmap, self.r_list1, self.list_temp_mask)
 
             else:
-                self.my_scene(
-                    new_pixmap, [], self.list_temp_mask
-                )
+                self.my_scene(new_pixmap, [], self.list_temp_mask)
 
         except (TypeError, AttributeError):
             print("None self.np_full_img")
 
         try:
-            m_rgb_np = self.bmp_mask.img_2d_rgb(data2d = self.np_full_mask_img)
+            m_rgb_np = self.bmp_mask.img_2d_rgb(data2d=self.np_full_mask_img)
             q_img = QImage(
                 m_rgb_np.data,
                 np.size(m_rgb_np[0:1, :, 0:1]),
                 np.size(m_rgb_np[:, 0:1, 0:1]),
-                QImage.Format_ARGB32
+                QImage.Format_ARGB32,
             )
             new_m_pixmap = QPixmap.fromImage(q_img)
             self.my_scene.add_mask_pixmap(new_m_pixmap)
@@ -996,17 +984,17 @@ class DoImageView(QObject):
             print("first full image loading")
 
         self.load_full_image = LoadFullImage(
-            unit_URL = self.uni_url,
-            cur_nod_num = self.cur_nod_num,
-            cur_img_num = self.cur_img_num,
-            path_in = self.exp_path
+            unit_URL=self.uni_url,
+            cur_nod_num=self.cur_nod_num,
+            cur_img_num=self.cur_img_num,
+            path_in=self.exp_path,
         )
 
         self.load_full_mask_image = LoadFullMaskImage(
-            unit_URL = self.uni_url,
-            cur_nod_num = self.cur_nod_num,
-            cur_img_num = self.cur_img_num,
-            path_in = self.exp_path
+            unit_URL=self.uni_url,
+            cur_nod_num=self.cur_nod_num,
+            cur_img_num=self.cur_img_num,
+            path_in=self.exp_path,
         )
 
         self.load_full_image.image_loaded.connect(self.new_full_img)
@@ -1017,12 +1005,14 @@ class DoImageView(QObject):
 
     def check_move(self):
         self.get_x1_y1_x2_y2()
-        if(
-            self.old_x1 != self.x1 or self.old_y1 != self.y1 or
-            self.old_x2 != self.x2 or self.old_y2 != self.y2 or
-            self.old_inv_scl != self.inv_scale or
-            self.old_nod_num != self.cur_nod_num or
-            self.old_img_num != self.cur_img_num
+        if (
+            self.old_x1 != self.x1
+            or self.old_y1 != self.y1
+            or self.old_x2 != self.x2
+            or self.old_y2 != self.y2
+            or self.old_inv_scl != self.inv_scale
+            or self.old_nod_num != self.cur_nod_num
+            or self.old_img_num != self.cur_img_num
         ):
             print("scaled, dragged or changed image")
             self.slice_show_img()
@@ -1037,8 +1027,10 @@ class DoImageView(QObject):
 
     def det_tmp_x1_y1_x2_y2(self):
         viewport_rect = QRect(
-            0, 0, self.main_obj.window.imageView.viewport().width(),
-            self.main_obj.window.imageView.viewport().height()
+            0,
+            0,
+            self.main_obj.window.imageView.viewport().width(),
+            self.main_obj.window.imageView.viewport().height(),
         )
         visibleSceneRect = self.main_obj.window.imageView.mapToScene(
             viewport_rect
@@ -1068,12 +1060,14 @@ class DoImageView(QObject):
         except TypeError:
             (self.x1, self.y1, self.x2, self.y2) = (-1, -1, -1, -1)
 
-
     def get_scale_label(self):
-        avg_scale = float(
-            self.main_obj.window.imageView.transform().m11() +
-            self.main_obj.window.imageView.transform().m22()
-        ) / 2.0
+        avg_scale = (
+            float(
+                self.main_obj.window.imageView.transform().m11()
+                + self.main_obj.window.imageView.transform().m22()
+            )
+            / 2.0
+        )
         avg_scale = abs(avg_scale)
         str_label = "scale = {:3.3}".format(avg_scale)
         self.main_obj.window.InvScaleLabel.setText(str_label)
@@ -1092,28 +1086,27 @@ class DoImageView(QObject):
     def new_slice_img(self, dict_slice):
         try:
             slice_image = dict_slice["slice_image"]
-            rep_slice_img = np.repeat(np.repeat(
-                    slice_image[:,:],
-                    dict_slice["inv_scale"], axis=0
-                ),
-                dict_slice["inv_scale"], axis=1
+            rep_slice_img = np.repeat(
+                np.repeat(slice_image[:, :], dict_slice["inv_scale"], axis=0),
+                dict_slice["inv_scale"],
+                axis=1,
             )
 
-            rep_len_x = np.size(rep_slice_img[:,0:1])
-            rep_len_y = np.size(rep_slice_img[0:1,:])
+            rep_len_x = np.size(rep_slice_img[:, 0:1])
+            rep_len_y = np.size(rep_slice_img[0:1, :])
 
-            if dict_slice["x1"] + rep_len_x > np.size(self.np_full_img[:,0:1]):
-                rep_len_x = np.size(self.np_full_img[:,0:1]) - dict_slice["x1"]
+            if dict_slice["x1"] + rep_len_x > np.size(self.np_full_img[:, 0:1]):
+                rep_len_x = np.size(self.np_full_img[:, 0:1]) - dict_slice["x1"]
                 print("limiting dx")
 
-            if dict_slice["y1"] + rep_len_y > np.size(self.np_full_img[0:1,:]):
-                rep_len_y = np.size(self.np_full_img[0:1,:]) - dict_slice["y1"]
+            if dict_slice["y1"] + rep_len_y > np.size(self.np_full_img[0:1, :]):
+                rep_len_y = np.size(self.np_full_img[0:1, :]) - dict_slice["y1"]
                 print("limiting dy")
 
             if self.full_image_loaded == False:
                 self.np_full_img[
-                    dict_slice["x1"]:dict_slice["x1"] + rep_len_x,
-                    dict_slice["y1"]:dict_slice["y1"] + rep_len_y
+                    dict_slice["x1"] : dict_slice["x1"] + rep_len_x,
+                    dict_slice["y1"] : dict_slice["y1"] + rep_len_y,
                 ] = rep_slice_img[0:rep_len_x, 0:rep_len_y]
                 self.refresh_pixel_map()
 
@@ -1126,27 +1119,34 @@ class DoImageView(QObject):
         if self.easter_egg_active:
             try:
                 slice_image = dict_slice["slice_image"]
-                rep_slice_img = np.repeat(np.repeat(
-                        slice_image[:,:],
-                        dict_slice["inv_scale"], axis=0
-                    ),
-                    dict_slice["inv_scale"], axis=1
+                rep_slice_img = np.repeat(
+                    np.repeat(slice_image[:, :], dict_slice["inv_scale"], axis=0),
+                    dict_slice["inv_scale"],
+                    axis=1,
                 )
-                rep_len_x = np.size(rep_slice_img[:,0:1])
-                rep_len_y = np.size(rep_slice_img[0:1,:])
+                rep_len_x = np.size(rep_slice_img[:, 0:1])
+                rep_len_y = np.size(rep_slice_img[0:1, :])
 
-                if dict_slice["x1"] + rep_len_x > np.size(self.np_full_mask_img[:,0:1]):
-                    rep_len_x = np.size(self.np_full_mask_img[:,0:1]) - dict_slice["x1"]
+                if dict_slice["x1"] + rep_len_x > np.size(
+                    self.np_full_mask_img[:, 0:1]
+                ):
+                    rep_len_x = (
+                        np.size(self.np_full_mask_img[:, 0:1]) - dict_slice["x1"]
+                    )
                     print("limiting dx")
 
-                if dict_slice["y1"] + rep_len_y > np.size(self.np_full_mask_img[0:1,:]):
-                    rep_len_y = np.size(self.np_full_mask_img[0:1,:]) - dict_slice["y1"]
+                if dict_slice["y1"] + rep_len_y > np.size(
+                    self.np_full_mask_img[0:1, :]
+                ):
+                    rep_len_y = (
+                        np.size(self.np_full_mask_img[0:1, :]) - dict_slice["y1"]
+                    )
                     print("limiting dy")
 
                 if self.full_image_loaded == False:
                     self.np_full_mask_img[
-                        dict_slice["x1"]:dict_slice["x1"] + rep_len_x,
-                        dict_slice["y1"]:dict_slice["y1"] + rep_len_y
+                        dict_slice["x1"] : dict_slice["x1"] + rep_len_x,
+                        dict_slice["y1"] : dict_slice["y1"] + rep_len_y,
                     ] = rep_slice_img[0:rep_len_x, 0:rep_len_y]
                     self.refresh_pixel_map()
 
@@ -1180,42 +1180,34 @@ class DoImageView(QObject):
             self.set_inv_scale()
 
             self.load_slice_image = LoadSliceImage(
-                unit_URL = self.uni_url,
-                nod_num_lst = [self.cur_nod_num],
-                img_num = self.cur_img_num,
-                inv_scale = self.inv_scale,
-                x1 = self.x1,
-                y1 = self.y1,
-                x2 = self.x2,
-                y2 = self.y2,
-                path_in = self.exp_path
+                unit_URL=self.uni_url,
+                nod_num_lst=[self.cur_nod_num],
+                img_num=self.cur_img_num,
+                inv_scale=self.inv_scale,
+                x1=self.x1,
+                y1=self.y1,
+                x2=self.x2,
+                y2=self.y2,
+                path_in=self.exp_path,
             )
-            self.load_slice_image.slice_loaded.connect(
-                self.new_slice_img
-            )
-            self.load_slice_image.progressing.connect(
-                self.update_progress
-            )
+            self.load_slice_image.slice_loaded.connect(self.new_slice_img)
+            self.load_slice_image.progressing.connect(self.update_progress)
             self.load_slice_image.start()
 
             # Now Same for mask
             self.load_slice_mask_image = LoadSliceMaskImage(
-                unit_URL = self.uni_url,
-                nod_num_lst = [self.cur_nod_num],
-                img_num = self.cur_img_num,
-                inv_scale = self.inv_scale,
-                x1 = self.x1,
-                y1 = self.y1,
-                x2 = self.x2,
-                y2 = self.y2,
-                path_in = self.exp_path
+                unit_URL=self.uni_url,
+                nod_num_lst=[self.cur_nod_num],
+                img_num=self.cur_img_num,
+                inv_scale=self.inv_scale,
+                x1=self.x1,
+                y1=self.y1,
+                x2=self.x2,
+                y2=self.y2,
+                path_in=self.exp_path,
             )
-            self.load_slice_mask_image.slice_loaded.connect(
-                self.new_slice_mask_img
-            )
-            self.load_slice_mask_image.progressing.connect(
-                self.update_progress
-            )
+            self.load_slice_mask_image.slice_loaded.connect(self.new_slice_mask_img)
+            self.load_slice_mask_image.progressing.connect(self.update_progress)
             self.load_slice_mask_image.start()
 
     def OneOneScale(self, event):
@@ -1239,14 +1231,9 @@ class DoImageView(QObject):
         dy = tmp_y2 - tmp_y1
 
         try:
-            if(
-                (
-                    relative_new_scale > 1.0 and  dx > 10 and dy > 10
-                ) or (
-                    relative_new_scale < 1.0 and (
-                        dx <= self.img_d1_d2[0] or dy <= self.img_d1_d2[1]
-                    )
-                )
+            if (relative_new_scale > 1.0 and dx > 10 and dy > 10) or (
+                relative_new_scale < 1.0
+                and (dx <= self.img_d1_d2[0] or dy <= self.img_d1_d2[1])
             ):
                 self.main_obj.window.imageView.scale(
                     relative_new_scale, relative_new_scale
@@ -1262,18 +1249,28 @@ class DoImageView(QObject):
         m22 = self.main_obj.window.imageView.transform().m22()
         if m11 < 0 or m22 < 0:
             print(
-                "\n re-inverting image from m11, m22 =", m11, m22, "\n",
+                "\n re-inverting image from m11, m22 =",
+                m11,
+                m22,
+                "\n",
             )
             self.main_obj.window.imageView.setMatrix(
                 QMatrix(
-                    float(abs(m11)), float(0.0), float(0.0),
-                    float(abs(m22)), float(0.0), float(0.0)
+                    float(abs(m11)),
+                    float(0.0),
+                    float(0.0),
+                    float(abs(m22)),
+                    float(0.0),
+                    float(0.0),
                 )
             )
             m11 = self.main_obj.window.imageView.transform().m11()
             m22 = self.main_obj.window.imageView.transform().m22()
             print(
-                "\n ... To m11, m22 =", m11, m22, "\n",
+                "\n ... To m11, m22 =",
+                m11,
+                m22,
+                "\n",
             )
 
     def easter_egg(self, event):
@@ -1281,21 +1278,17 @@ class DoImageView(QObject):
         print("self.easter_egg_active =", self.easter_egg_active)
         self.full_image_loaded = False
 
-    def set_drag_mode(self, mask_mode = False):
+    def set_drag_mode(self, mask_mode=False):
         self.mask_mode = mask_mode
         if self.mask_mode:
-            self.main_obj.window.imageView.setDragMode(
-                QGraphicsView.NoDrag
-            )
+            self.main_obj.window.imageView.setDragMode(QGraphicsView.NoDrag)
 
         else:
-            self.main_obj.window.imageView.setDragMode(
-                QGraphicsView.ScrollHandDrag
-            )
+            self.main_obj.window.imageView.setDragMode(QGraphicsView.ScrollHandDrag)
 
         print("\n set_drag_mode \n mask_mode =", self.mask_mode)
 
-    def set_mask_comp(self, mask_comp = None):
+    def set_mask_comp(self, mask_comp=None):
         self.mask_comp = mask_comp
         print("mask_comp =", self.mask_comp)
         if self.mask_comp is None:
@@ -1308,8 +1301,14 @@ class DoImageView(QObject):
 
     def on_mouse_move(self, x_pos, y_pos):
         try:
-            str_out = "  I(" + str(x_pos) + ", " + str(y_pos) + ")  =  " +\
-                  "{:8.1f}".format(self.np_full_img[y_pos, x_pos])
+            str_out = (
+                "  I("
+                + str(x_pos)
+                + ", "
+                + str(y_pos)
+                + ")  =  "
+                + "{:8.1f}".format(self.np_full_img[y_pos, x_pos])
+            )
 
         except (AttributeError, IndexError, TypeError):
             str_out = " I  =  ?"
@@ -1325,10 +1324,10 @@ class DoImageView(QObject):
         self.my_scene.update_tmp_mask(self.list_temp_mask)
         if self.mask_mode:
             self.my_scene.draw_temp_mask()
-            if(
-                self.mask_comp is not None and
-                self.mask_x_ini is not None and
-                self.mask_y_ini is not None
+            if (
+                self.mask_comp is not None
+                and self.mask_x_ini is not None
+                and self.mask_y_ini is not None
             ):
                 if self.mask_comp == "rect":
                     x1 = int(x_pos)
@@ -1354,12 +1353,13 @@ class DoImageView(QObject):
                     rectangle = QRectF(
                         self.mask_x_ini - r, self.mask_y_ini - r, 2 * r, 2 * r
                     )
-                    self.my_scene.addEllipse(
-                        rectangle, self.my_scene.overlay_pen
-                    )
+                    self.my_scene.addEllipse(rectangle, self.my_scene.overlay_pen)
                     self.my_scene.addLine(
-                        self.mask_x_ini, self.mask_y_ini, x_pos,
-                        y_pos, self.my_scene.overlay_pen
+                        self.mask_x_ini,
+                        self.mask_y_ini,
+                        x_pos,
+                        y_pos,
+                        self.my_scene.overlay_pen,
                     )
 
                 elif self.mask_comp == "poly":
@@ -1368,8 +1368,11 @@ class DoImageView(QObject):
                     r = int(np.sqrt(dx * dx + dy * dy))
 
                     self.my_scene.addLine(
-                        self.mask_x_ini, self.mask_y_ini, x_pos,
-                        y_pos, self.my_scene.overlay_pen
+                        self.mask_x_ini,
+                        self.mask_y_ini,
+                        x_pos,
+                        y_pos,
+                        self.my_scene.overlay_pen,
                     )
 
     def on_mouse_press(self, x_pos, y_pos):
@@ -1383,10 +1386,10 @@ class DoImageView(QObject):
     def on_mouse_release(self, x_pos, y_pos):
         print("on_mouse_release \n x_pos, y_pos =", x_pos, y_pos)
         if self.mask_mode:
-            if(
-                self.mask_comp is not None and
-                self.mask_x_ini is not None and
-                self.mask_y_ini is not None
+            if (
+                self.mask_comp is not None
+                and self.mask_x_ini is not None
+                and self.mask_y_ini is not None
             ):
                 if self.mask_comp == "rect":
                     x_ini = int(self.mask_x_ini)
@@ -1413,11 +1416,11 @@ class DoImageView(QObject):
 
                     self.new_mask_comp.emit(
                         {
-                            "type"  : "rect" ,
-                            "x_ini" : x_ini ,
-                            "x_end" : x_end ,
-                            "y_ini" : y_ini ,
-                            "y_end" : y_end ,
+                            "type": "rect",
+                            "x_ini": x_ini,
+                            "x_end": x_end,
+                            "y_ini": y_ini,
+                            "y_end": y_end,
                         }
                     )
 
@@ -1427,10 +1430,10 @@ class DoImageView(QObject):
                     r = int(np.sqrt(dx * dx + dy * dy))
                     self.new_mask_comp.emit(
                         {
-                            "type"  : "circ" ,
-                            "x_c"   : int(self.mask_x_ini) ,
-                            "y_c"   : int(self.mask_y_ini) ,
-                            "r"     : r ,
+                            "type": "circ",
+                            "x_c": int(self.mask_x_ini),
+                            "y_c": int(self.mask_y_ini),
+                            "r": r,
                         }
                     )
 
@@ -1466,11 +1469,11 @@ class DoImageView(QObject):
 
                     self.new_mask_comp.emit(
                         {
-                            "type"  : "poly" ,
-                            "x_ini" : x_ini ,
-                            "x_end" : x_end ,
-                            "y_ini" : y_ini ,
-                            "y_end" : y_end ,
+                            "type": "poly",
+                            "x_ini": x_ini,
+                            "x_end": x_end,
+                            "y_ini": y_ini,
+                            "y_end": y_end,
                         }
                     )
 
@@ -1479,7 +1482,7 @@ class DoImageView(QObject):
 
 
 class MainImgViewObject(QObject):
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(MainImgViewObject, self).__init__(parent)
         self.parent_app = parent
         self.ui_dir_path = os.path.dirname(os.path.abspath(__file__))
@@ -1504,13 +1507,13 @@ class MainImgViewObject(QObject):
         self.window.NextImgButton.clicked.connect(self.next_img)
         self.window.OpenFileButton.clicked.connect(self.open_dir_widget)
 
-    def refresh_output(self, nod_or_path = True):
+    def refresh_output(self, nod_or_path=True):
         img_num = int(self.window.ImgNumEdit.text())
-        self.do_image_view(in_img_num = img_num, nod_or_path = nod_or_path)
+        self.do_image_view(in_img_num=img_num, nod_or_path=nod_or_path)
 
     def img_num_changed(self, new_img_num):
         print("should load IMG num:", new_img_num)
-        self.refresh_output(nod_or_path = self.nod_or_path)
+        self.refresh_output(nod_or_path=self.nod_or_path)
 
     def shift_img_num(self, sh_num):
         img_num = int(self.window.ImgNumEdit.text())
@@ -1532,36 +1535,31 @@ class MainImgViewObject(QObject):
         self.window.IntroPathEdit.setText(self.nod_or_path)
 
         my_cmd_lst = ["get_template 0"]
-        my_cmd = {"path"    : self.nod_or_path,
-                  "cmd_lst" : my_cmd_lst}
+        my_cmd = {"path": self.nod_or_path, "cmd_lst": my_cmd_lst}
 
         json_data_lst = json_data_request(self.uni_url, my_cmd)
 
         new_templ = json_data_lst[0]
         self.img_d1_d2 = (json_data_lst[1], json_data_lst[2])
         print("self.img_d1_d2 =", self.img_d1_d2)
-        self.refresh_output(nod_or_path = self.nod_or_path)
+        self.refresh_output(nod_or_path=self.nod_or_path)
 
     def open_dir_widget(self):
-        #TODO make sure self.window is that goes as argument
+        # TODO make sure self.window is that goes as argument
         self.open_widget = FileBrowser(self.window)
         self.open_widget.resize(self.open_widget.size() * 2)
         self.open_widget.file_or_dir_selected.connect(self.set_selection)
 
 
-def main(par_def = None):
+def main(par_def=None):
     data_init = ini_data()
     data_init.set_data(par_def)
     uni_url = data_init.get_url()
 
-    print('get_if_local =', data_init.get_if_local(), 'get_url =', data_init.get_url())
+    print("get_if_local =", data_init.get_if_local(), "get_url =", data_init.get_url())
 
     app = QApplication(sys.argv)
-    m_obj = MainImgViewObject(parent = app)
+    m_obj = MainImgViewObject(parent=app)
     print("before sys.exit")
     sys.exit(app.exec_())
     print("after sys.exit")
-
-
-
-

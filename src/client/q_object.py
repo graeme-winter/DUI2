@@ -31,15 +31,21 @@ from PySide2.QtGui import *
 from PySide2.QtWebEngineWidgets import QWebEngineView
 
 from client.gui_utils import (
-    TreeDirScene, widgets_defs, get_widget_def_dict,
-    find_scale_cmd, find_next_cmd
+    TreeDirScene,
+    widgets_defs,
+    get_widget_def_dict,
+    find_scale_cmd,
+    find_next_cmd,
 )
 from client.outputs import DoLoadHTML, ShowLog, HandleReciprocalLatticeView
 from client.img_view import DoImageView
 from client.reindex_table import ReindexTable, get_label_from_str_list
 from client.exec_utils import (
-    get_optional_list, build_advanced_params_widget, json_data_request,
-    Run_n_Output, CommandParamControl
+    get_optional_list,
+    build_advanced_params_widget,
+    json_data_request,
+    Run_n_Output,
+    CommandParamControl,
 )
 
 from client.init_firts import ini_data
@@ -50,15 +56,19 @@ from client.simpler_param_widgets import MaskWidget
 from client.simpler_param_widgets import ExportWidget
 from client.simpler_param_widgets import OptionalWidget
 from client.simpler_param_widgets import (
-    FindspotsSimplerParameterTab, IndexSimplerParamTab,
-    RefineBravaiSimplerParamTab, RefineSimplerParamTab,
-    IntegrateSimplerParamTab, SymmetrySimplerParamTab,
-    ScaleSimplerParamTab, CombineExperimentSimplerParamTab
+    FindspotsSimplerParameterTab,
+    IndexSimplerParamTab,
+    RefineBravaiSimplerParamTab,
+    RefineSimplerParamTab,
+    IntegrateSimplerParamTab,
+    SymmetrySimplerParamTab,
+    ScaleSimplerParamTab,
+    CombineExperimentSimplerParamTab,
 )
 
 
 class MainObject(QObject):
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(MainObject, self).__init__(parent)
         self.parent_app = parent
         self.ui_dir_path = os.path.dirname(os.path.abspath(__file__))
@@ -69,9 +79,14 @@ class MainObject(QObject):
         self.window.setWindowTitle("CCP4 DUI2")
 
         dui2_icon = QIcon()
-        st_icon_path = self.ui_dir_path + os.sep + "resources" \
-            + os.sep + "DIALS_Logo_smaller_centred.png"
-        dui2_icon.addFile(st_icon_path, mode = QIcon.Normal)
+        st_icon_path = (
+            self.ui_dir_path
+            + os.sep
+            + "resources"
+            + os.sep
+            + "DIALS_Logo_smaller_centred.png"
+        )
+        dui2_icon.addFile(st_icon_path, mode=QIcon.Normal)
         self.window.setWindowIcon(dui2_icon)
 
         data_init = ini_data()
@@ -92,11 +107,9 @@ class MainObject(QObject):
             self.window.ExportScrollArea.setWidget(self.expr_widg)
 
             self.opt_cmd_lst = get_optional_list("get_optional_command_list")
-            self.optional_widg = OptionalWidget(cmd_lst = self.opt_cmd_lst)
+            self.optional_widg = OptionalWidget(cmd_lst=self.opt_cmd_lst)
             self.window.OptionalScrollArea.setWidget(self.optional_widg)
-            self.optional_widg.all_items_changed.connect(
-                self.all_items_param_changed
-            )
+            self.optional_widg.all_items_changed.connect(self.all_items_param_changed)
             self.optional_widg.main_command_changed.connect(
                 self.new_main_command_changed
             )
@@ -115,10 +128,10 @@ class MainObject(QObject):
                 if par_line["full_path"] == "spotfinder.threshold.algorithm":
                     lst_opt = par_line["opt_lst"]
                     print("lst_opt =", lst_opt)
-                    if("radial_profile" in lst_opt):
+                    if "radial_profile" in lst_opt:
                         print(
                             "Time to ADD << spotfinder.threshold.algorithm >>",
-                            "to simple Params as a tick box"
+                            "to simple Params as a tick box",
                         )
                         rad_pr_add = True
 
@@ -126,18 +139,14 @@ class MainObject(QObject):
                         print(
                             "NO Need to add",
                             "<< spotfinder.threshold.algorithm >>",
-                            "to simple Params as a tick box"
+                            "to simple Params as a tick box",
                         )
                         rad_pr_add = False
 
             fd_advanced_parameters.item_changed.connect(self.item_param_changed)
-            self.window.FindspotsAdvancedScrollArea.setWidget(
-                fd_advanced_parameters
-            )
+            self.window.FindspotsAdvancedScrollArea.setWidget(fd_advanced_parameters)
 
-            find_simpl_widg = FindspotsSimplerParameterTab(
-                add_rad_prof = rad_pr_add
-            )
+            find_simpl_widg = FindspotsSimplerParameterTab(add_rad_prof=rad_pr_add)
             find_simpl_widg.item_changed.connect(self.item_param_changed)
             self.window.FindspotsSimplerScrollArea.setWidget(find_simpl_widg)
 
@@ -152,16 +161,12 @@ class MainObject(QObject):
 
             refi_brv_simpl_widg = RefineBravaiSimplerParamTab()
             refi_brv_simpl_widg.item_changed.connect(self.item_param_changed)
-            self.window.RefineBravaiSimplerScrollArea.setWidget(
-                refi_brv_simpl_widg
-            )
+            self.window.RefineBravaiSimplerScrollArea.setWidget(refi_brv_simpl_widg)
             rb_advanced_parameters = build_advanced_params_widget(
                 "refine_bravais_settings_params", self.window.RefineBravaisSearchLayout
             )
             rb_advanced_parameters.item_changed.connect(self.item_param_changed)
-            self.window.RefineBravaiAdvancedScrollArea.setWidget(
-                rb_advanced_parameters
-            )
+            self.window.RefineBravaiAdvancedScrollArea.setWidget(rb_advanced_parameters)
 
             self.r_index_widg = ReindexTable()
             self.window.ReindexHeaderLabel.setText("...")
@@ -183,9 +188,7 @@ class MainObject(QObject):
                 "integrate_params", self.window.IntegrateSearchLayout
             )
             it_advanced_parameters.item_changed.connect(self.item_param_changed)
-            self.window.IntegrateAdvancedScrollArea.setWidget(
-                it_advanced_parameters
-            )
+            self.window.IntegrateAdvancedScrollArea.setWidget(it_advanced_parameters)
 
             sym_simpl_widg = SymmetrySimplerParamTab()
             sym_simpl_widg.item_changed.connect(self.item_param_changed)
@@ -194,9 +197,7 @@ class MainObject(QObject):
                 "symmetry_params", self.window.SymetrySearchLayout
             )
             sm_advanced_parameters.item_changed.connect(self.item_param_changed)
-            self.window.SymmetryAdvancedScrollArea.setWidget(
-                sm_advanced_parameters
-            )
+            self.window.SymmetryAdvancedScrollArea.setWidget(sm_advanced_parameters)
 
             scale_simpl_widg = ScaleSimplerParamTab()
             scale_simpl_widg.item_changed.connect(self.item_param_changed)
@@ -214,9 +215,7 @@ class MainObject(QObject):
                 "combine_experiments_params", self.window.CombineSearchLayout
             )
             ce_advanced_parameters.item_changed.connect(self.item_param_changed)
-            self.window.CombineAdvancedScrollArea.setWidget(
-                ce_advanced_parameters
-            )
+            self.window.CombineAdvancedScrollArea.setWidget(ce_advanced_parameters)
 
             fd_advanced_parameters.twin_widg = find_simpl_widg
             find_simpl_widg.twin_widg = fd_advanced_parameters
@@ -240,9 +239,7 @@ class MainObject(QObject):
             sys.exit()
 
         tmp_widget_defs = widgets_defs
-        self.param_widgets = get_widget_def_dict(
-            widgets_defs, self.ui_dir_path
-        )
+        self.param_widgets = get_widget_def_dict(widgets_defs, self.ui_dir_path)
 
         self.param_widgets["Root"]["simple"] = imp_widg
         self.param_widgets["Root"]["advanced"] = None
@@ -264,17 +261,15 @@ class MainObject(QObject):
         self.param_widgets["index"]["advanced"] = id_advanced_parameters
         self.param_widgets["index"]["main_page"] = self.window.IndexPage
 
-        self.param_widgets[
-            "refine_bravais_settings"
-        ]["simple"] = refi_brv_simpl_widg
+        self.param_widgets["refine_bravais_settings"]["simple"] = refi_brv_simpl_widg
 
-        self.param_widgets[
-            "refine_bravais_settings"
-        ]["advanced"] = rb_advanced_parameters
+        self.param_widgets["refine_bravais_settings"][
+            "advanced"
+        ] = rb_advanced_parameters
 
-        self.param_widgets[
-            "refine_bravais_settings"
-        ]["main_page"] = self.window.RefinBrabPage
+        self.param_widgets["refine_bravais_settings"][
+            "main_page"
+        ] = self.window.RefinBrabPage
 
         self.param_widgets["reindex"]["simple"] = self.r_index_widg
         self.param_widgets["reindex"]["advanced"] = None
@@ -297,13 +292,9 @@ class MainObject(QObject):
         self.param_widgets["scale"]["main_page"] = self.window.ScalePage
 
         self.param_widgets["combine_experiments"]["simple"] = comb_simpl_widg
-        self.param_widgets[
-            "combine_experiments"
-        ]["advanced"] = ce_advanced_parameters
+        self.param_widgets["combine_experiments"]["advanced"] = ce_advanced_parameters
 
-        self.param_widgets[
-            "combine_experiments"
-        ]["main_page"] = self.window.CombinePage
+        self.param_widgets["combine_experiments"]["main_page"] = self.window.CombinePage
 
         self.param_widgets["export"]["simple"] = self.expr_widg
         self.param_widgets["export"]["advanced"] = None
@@ -316,37 +307,34 @@ class MainObject(QObject):
         self.tree_scene = TreeDirScene(self)
         self.window.treeView.setScene(self.tree_scene)
 
-        self.window.Next2RunLayout.addWidget(
-            QLabel("                  . . .       ")
-        )
+        self.window.Next2RunLayout.addWidget(QLabel("                  . . .       "))
         self.current_next_buttons = 0
         self.parent_nums_lst = []
 
         self.font_point_size = QFont().pointSize()
 
         self.tree_scene.node_clicked.connect(self.on_node_click)
-        self.window.Reset2DefaultPushButton.clicked.connect(
-            self.reset_new_node
-        )
-        self.window.ClearParentButton.clicked.connect(
-            self.clear_parent_list
-        )
+        self.window.Reset2DefaultPushButton.clicked.connect(self.reset_new_node)
+        self.window.ClearParentButton.clicked.connect(self.clear_parent_list)
         self.r_index_widg.opt_signal.connect(self.launch_reindex)
 
         re_try_icon = QIcon()
-        rt_icon_path = self.ui_dir_path + os.sep + "resources" \
-            + os.sep + "re_try.png"
-        re_try_icon.addFile(rt_icon_path, mode = QIcon.Normal)
+        rt_icon_path = self.ui_dir_path + os.sep + "resources" + os.sep + "re_try.png"
+        re_try_icon.addFile(rt_icon_path, mode=QIcon.Normal)
         self.window.RetryButton.setIcon(re_try_icon)
         run_icon = QIcon()
-        rn_icon_path = self.ui_dir_path + os.sep + "resources" \
-            + os.sep + "DIALS_Logo_smaller_centred.png"
-        run_icon.addFile(rn_icon_path, mode = QIcon.Normal)
+        rn_icon_path = (
+            self.ui_dir_path
+            + os.sep
+            + "resources"
+            + os.sep
+            + "DIALS_Logo_smaller_centred.png"
+        )
+        run_icon.addFile(rn_icon_path, mode=QIcon.Normal)
         self.window.CmdSend2server.setIcon(run_icon)
         stop_icon = QIcon()
-        st_icon_path = self.ui_dir_path + os.sep + "resources" \
-            + os.sep + "stop.png"
-        stop_icon.addFile(st_icon_path, mode = QIcon.Normal)
+        st_icon_path = self.ui_dir_path + os.sep + "resources" + os.sep + "stop.png"
+        stop_icon.addFile(st_icon_path, mode=QIcon.Normal)
         self.window.ReqStopButton.setIcon(stop_icon)
 
         self.window.RetryButton.clicked.connect(self.on_clone)
@@ -358,12 +346,8 @@ class MainObject(QObject):
 
         self.recip_latt = HandleReciprocalLatticeView(self)
         self.recip_latt.get_nod_num.connect(self.verify_nod_num)
-        self.window.RecipLattOpenButton.clicked.connect(
-            self.RecipLattOpenClicked
-        )
-        self.window.RecipLattStopButton.clicked.connect(
-            self.RecipLattCloseClicked
-        )
+        self.window.RecipLattOpenButton.clicked.connect(self.RecipLattOpenClicked)
+        self.window.RecipLattStopButton.clicked.connect(self.RecipLattCloseClicked)
 
         try:
             self.do_load_html = DoLoadHTML(self)
@@ -393,10 +377,10 @@ class MainObject(QObject):
         self.change_widget(self.curr_widg_key)
         self.thrd_lst = []
 
-        TODO_look_at_this = '''
+        TODO_look_at_this = """
         self.window.MainHSplitter.setStretchFactor(0, 3)
         self.window.MainHSplitter.setStretchFactor(1, 2)
-        '''
+        """
         self.window.LeftVSplitter.setStretchFactor(0, 3)
         self.window.LeftVSplitter.setStretchFactor(1, 1)
 
@@ -408,7 +392,7 @@ class MainObject(QObject):
     def close_event(self):
         print("\n aboutToQuit ... 1\n")
         self.recip_latt.quit_kill_all()
-        cmd = {"nod_lst":"", "cmd_lst":["closed"]}
+        cmd = {"nod_lst": "", "cmd_lst": ["closed"]}
         resp = json_data_request(self.uni_url, cmd)
         print("resp =", resp)
         print("\n aboutToQuit ... 2\n")
@@ -455,7 +439,7 @@ class MainObject(QObject):
         print("next_img")
         self.shift_img_num(1)
 
-    def refresh_output(self, tab_index = None):
+    def refresh_output(self, tab_index=None):
         if tab_index == None:
             tab_index = self.window.OutputTabWidget.currentIndex()
 
@@ -470,10 +454,10 @@ class MainObject(QObject):
             try:
                 simpl_widg = self.param_widgets[self.curr_widg_key]["simple"]
                 new_lst = simpl_widg.comp_list_update()
-                if(
-                    self.new_node is not None and
-                    self.new_node.m_cmd_lst[0] == "dials.generate_mask" and
-                    self.new_node.number == self.curr_nod_num
+                if (
+                    self.new_node is not None
+                    and self.new_node.m_cmd_lst[0] == "dials.generate_mask"
+                    and self.new_node.number == self.curr_nod_num
                 ):
                     lst_tmp_par = new_lst[0][0:-1]
 
@@ -483,18 +467,18 @@ class MainObject(QObject):
             self.do_image_view.update_tmp_mask(lst_tmp_par)
 
             try:
-                if(
-                    self.new_node is not None and
-                    self.new_node.m_cmd_lst[0] == "dials.generate_mask" and
-                    self.new_node.number == self.curr_nod_num
+                if (
+                    self.new_node is not None
+                    and self.new_node.m_cmd_lst[0] == "dials.generate_mask"
+                    and self.new_node.number == self.curr_nod_num
                 ):
-                    self.do_image_view.set_drag_mode(mask_mode = True)
+                    self.do_image_view.set_drag_mode(mask_mode=True)
 
                 else:
-                    self.do_image_view.set_drag_mode(mask_mode = False)
+                    self.do_image_view.set_drag_mode(mask_mode=False)
 
             except IndexError:
-                    self.do_image_view.set_drag_mode(mask_mode = False)
+                self.do_image_view.set_drag_mode(mask_mode=False)
 
             try:
                 img_num = int(self.window.ImgNumEdit.text())
@@ -502,7 +486,7 @@ class MainObject(QObject):
             except ValueError:
                 img_num = 0
 
-            self.do_image_view(in_img_num = img_num, nod_or_path = fnd_cur_nod)
+            self.do_image_view(in_img_num=img_num, nod_or_path=fnd_cur_nod)
 
         elif tab_index == 1:
             try:
@@ -511,13 +495,11 @@ class MainObject(QObject):
             except IndexError:
                 nod_stat = "Busy"
 
-            self.log_show(
-                self.curr_nod_num, do_request = fnd_cur_nod, stat = nod_stat
-            )
+            self.log_show(self.curr_nod_num, do_request=fnd_cur_nod, stat=nod_stat)
 
         elif tab_index == 2:
             try:
-                self.do_load_html(do_request = fnd_cur_nod)
+                self.do_load_html(do_request=fnd_cur_nod)
 
             except AttributeError:
                 print("removing HtmlReport for old vesion of PySide2 ")
@@ -541,7 +523,10 @@ class MainObject(QObject):
     def verify_nod_num(self, loaded_nod_num):
         print(
             "verify_nod_num \n",
-            " (Main QObject)=", self.curr_nod_num, "(loaded)=", loaded_nod_num
+            " (Main QObject)=",
+            self.curr_nod_num,
+            "(loaded)=",
+            loaded_nod_num,
         )
         if self.curr_nod_num == loaded_nod_num:
             print("same node as when clicked")
@@ -581,13 +566,11 @@ class MainObject(QObject):
             self.update_all_param()
             if key2find == "reindex":
                 cmd = {
-                    "nod_lst":cur_nod["parent_node_lst"],
-                    "cmd_lst":["get_bravais_sum"]
+                    "nod_lst": cur_nod["parent_node_lst"],
+                    "cmd_lst": ["get_bravais_sum"],
                 }
                 json_data_lst = json_data_request(self.uni_url, cmd)
-                self.r_index_widg.add_opts_lst(
-                    json_data = json_data_lst[0]
-                )
+                self.r_index_widg.add_opts_lst(json_data=json_data_lst[0])
                 self.update_reindex_table_header(cur_nod["parent_node_lst"])
 
         except KeyError:
@@ -609,13 +592,12 @@ class MainObject(QObject):
 
     def on_node_click(self, node_numb):
         if (
-            self.new_node is not None and
-
-            node_numb != self.curr_nod_num and
-            node_numb != self.new_node.number and
-            self.window.NodeSelecCheck.checkState() and
-            self.server_nod_lst[node_numb]["status"] == "Succeeded" and
-            self.new_node.m_cmd_lst == ["dials.combine_experiments"]
+            self.new_node is not None
+            and node_numb != self.curr_nod_num
+            and node_numb != self.new_node.number
+            and self.window.NodeSelecCheck.checkState()
+            and self.server_nod_lst[node_numb]["status"] == "Succeeded"
+            and self.new_node.m_cmd_lst == ["dials.combine_experiments"]
         ):
             self.new_node.add_or_remove_parent(node_numb)
             self.display()
@@ -647,15 +629,15 @@ class MainObject(QObject):
 
     def update_nxt_butt(self, str_key):
         small_f_size = int(self.font_point_size * 0.75)
-        small_font = QFont("OldEnglish", pointSize = small_f_size, italic=True)
+        small_font = QFont("OldEnglish", pointSize=small_f_size, italic=True)
         try:
-            if(
-                self.server_nod_lst[self.curr_nod_num]["status"] == "Succeeded"
-            ):
+            if self.server_nod_lst[self.curr_nod_num]["status"] == "Succeeded":
                 fnd_nxt_cmd = find_next_cmd(
                     self.server_nod_lst,
                     self.server_nod_lst[self.curr_nod_num]["parent_node_lst"],
-                    str_key, self.param_widgets, self.opt_cmd_lst
+                    str_key,
+                    self.param_widgets,
+                    self.opt_cmd_lst,
                 )
                 nxt_cmd_lst = fnd_nxt_cmd.get_nxt_cmd()
                 print("next command lst =", nxt_cmd_lst)
@@ -679,7 +661,7 @@ class MainObject(QObject):
         self.nxt_key_clicked(self.sender().cmd_str)
 
     def update_reindex_table_header(self, nod_lst):
-        cmd = {"nod_lst":nod_lst, "cmd_lst":["display_log"]}
+        cmd = {"nod_lst": nod_lst, "cmd_lst": ["display_log"]}
         json_log = json_data_request(self.uni_url, cmd)
         try:
             lst_log_lines = json_log[0]
@@ -694,14 +676,9 @@ class MainObject(QObject):
         print("nxt_clicked ... str_key: ", str_key)
 
         if str_key == "reindex":
-            cmd = {
-                "nod_lst":[self.curr_nod_num],
-                "cmd_lst":["get_bravais_sum"]
-            }
+            cmd = {"nod_lst": [self.curr_nod_num], "cmd_lst": ["get_bravais_sum"]}
             json_data_lst = json_data_request(self.uni_url, cmd)
-            self.r_index_widg.add_opts_lst(
-                json_data = json_data_lst[0]
-            )
+            self.r_index_widg.add_opts_lst(json_data=json_data_lst[0])
             self.update_reindex_table_header([self.curr_nod_num])
 
         self.change_widget(str_key)
@@ -759,13 +736,10 @@ class MainObject(QObject):
         except AttributeError:
             print("Not updating parameters, no (green node or twin widget)\n")
 
-    def item_param_changed(self, str_path = None, str_value = None, lst_num = 0):
+    def item_param_changed(self, str_path=None, str_value=None, lst_num=0):
         self.sender().twin_widg.update_param(str_path, str_value)
         try:
-            if(
-                self.curr_nod_num == self.new_node.number
-                and not self.reseting
-            ):
+            if self.curr_nod_num == self.new_node.number and not self.reseting:
                 self.new_node.set_parameter(str_path, str_value, lst_num)
 
         except AttributeError:
@@ -774,21 +748,15 @@ class MainObject(QObject):
     def add_new_node(self):
         print("add_new_node")
         local_main_cmd = self.param_widgets[self.curr_widg_key]["main_cmd"]
-        self.new_node = CommandParamControl(
-            main_list = local_main_cmd
-        )
-        self.new_node.set_connections(
-            self.server_nod_lst, [self.curr_nod_num]
-        )
+        self.new_node = CommandParamControl(main_list=local_main_cmd)
+        self.new_node.set_connections(self.server_nod_lst, [self.curr_nod_num])
         self.curr_nod_num = self.new_node.number
         self.display()
         self.refresh_output()
-        if local_main_cmd == ['dials.export']:
+        if local_main_cmd == ["dials.export"]:
             self.param_widgets[self.curr_widg_key]["simple"].reset_pars()
 
-        cmd = {
-            "nod_lst":self.new_node.parent_node_lst, "cmd_lst":["get_lambda"]
-        }
+        cmd = {"nod_lst": self.new_node.parent_node_lst, "cmd_lst": ["get_lambda"]}
         json_lamb = json_data_request(self.uni_url, cmd)
         try:
             lamb = json_lamb[0]
@@ -826,7 +794,7 @@ class MainObject(QObject):
 
         print(
             "update_all_param(MainObject)...tmp_cmd_par.get_all_params() = ",
-            tmp_cmd_par.get_all_params()
+            tmp_cmd_par.get_all_params(),
         )
         self.param_widgets[self.curr_widg_key]["simple"].update_all_pars(
             tmp_cmd_par.get_all_params()
@@ -885,10 +853,10 @@ class MainObject(QObject):
 
     def check_if_exported(self):
         try:
-            if(
-                self.server_nod_lst[self.curr_nod_num]["status"]  == "Succeeded"
-                and
-                self.server_nod_lst[self.curr_nod_num]["cmd2show"][0] == "dials.export"
+            if (
+                self.server_nod_lst[self.curr_nod_num]["status"] == "Succeeded"
+                and self.server_nod_lst[self.curr_nod_num]["cmd2show"][0]
+                == "dials.export"
             ):
                 enabl = True
 
@@ -898,33 +866,31 @@ class MainObject(QObject):
         except IndexError:
             enabl = False
 
-        self.expr_widg.set_download_stat(do_enable = enabl, nod_num = self.curr_nod_num)
+        self.expr_widg.set_download_stat(do_enable=enabl, nod_num=self.curr_nod_num)
 
     def display(self):
         self.tree_scene.draw_tree_graph(
-            nod_lst_in = self.server_nod_lst,
-            curr_nod_num = self.curr_nod_num,
-            new_node = self.new_node
+            nod_lst_in=self.server_nod_lst,
+            curr_nod_num=self.curr_nod_num,
+            new_node=self.new_node,
         )
         self.gray_n_ungray()
 
     def request_display(self):
-        cmd = {"nod_lst":"", "cmd_lst":["display"]}
+        cmd = {"nod_lst": "", "cmd_lst": ["display"]}
         self.server_nod_lst = json_data_request(self.uni_url, cmd)
         self.display()
 
     def on_clone(self):
         print("on_clone")
         self.new_node = CommandParamControl(
-            main_list = self.param_widgets[self.curr_widg_key]["main_cmd"]
+            main_list=self.param_widgets[self.curr_widg_key]["main_cmd"]
         )
         self.new_node.set_connections(
             self.server_nod_lst,
-            self.server_nod_lst[self.curr_nod_num]["parent_node_lst"]
+            self.server_nod_lst[self.curr_nod_num]["parent_node_lst"],
         )
-        self.new_node.clone_from_list(
-            self.server_nod_lst[self.curr_nod_num]["lst2run"]
-        )
+        self.new_node.clone_from_list(self.server_nod_lst[self.curr_nod_num]["lst2run"])
         self.curr_nod_num = self.new_node.number
         self.display()
         self.check_nxt_btn()
@@ -933,14 +899,12 @@ class MainObject(QObject):
     def request_launch(self):
         cmd_lst = self.new_node.get_full_command_list()
         lst_of_node_str = self.new_node.parent_node_lst
-        cmd = {'nod_lst': lst_of_node_str, 'cmd_lst': cmd_lst}
+        cmd = {"nod_lst": lst_of_node_str, "cmd_lst": cmd_lst}
         print("cmd =", cmd)
         self.window.incoming_text.clear()
         self.window.incoming_text.setTextColor(self.log_show.green_color)
         try:
-            new_req_post = requests.post(
-                self.uni_url, stream = True, data = cmd
-            )
+            new_req_post = requests.post(self.uni_url, stream=True, data=cmd)
             new_thrd = Run_n_Output(new_req_post)
             new_thrd.new_line_out.connect(self.log_show.add_line)
             new_thrd.first_line.connect(self.line_n1_in)
@@ -952,24 +916,22 @@ class MainObject(QObject):
 
         except requests.exceptions.RequestException:
             print("something went wrong with the request launch")
-            #TODO: put inside this << except >> some way to kill << new_thrd >>
+            # TODO: put inside this << except >> some way to kill << new_thrd >>
 
     def line_n1_in(self, nod_num_in):
         self.request_display()
         print("line_n1_in(nod_num_in) = ", nod_num_in)
-        #TODO: consider if this line goes in << request_launch >>
+        # TODO: consider if this line goes in << request_launch >>
         self.new_node = None
 
     def req_stop(self):
         print("req_stop")
         nod_lst = [str(self.curr_nod_num)]
         print("\n nod_lst", nod_lst)
-        cmd = {"nod_lst":nod_lst, "cmd_lst":["stop"]}
+        cmd = {"nod_lst": nod_lst, "cmd_lst": ["stop"]}
         print("cmd =", cmd)
         try:
             lst_params = json_data_request(self.uni_url, cmd)
 
         except requests.exceptions.RequestException:
-            print(
-                "something went wrong with the request launch"
-            )
+            print("something went wrong with the request launch")

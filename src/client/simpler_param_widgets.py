@@ -33,6 +33,7 @@ from PySide2.QtGui import *
 from client.init_firts import ini_data
 from client.exec_utils import Mtz_Data_Request
 
+
 def _get_all_direct_layout_widget_children(parent):
     """Walk a widget tree and get all non-QLayout direct children
 
@@ -58,7 +59,7 @@ class DefaultComboBox(QComboBox):
     """A ComboBox initialised with a list of items and keeps track of which one
     is default"""
 
-    def __init__(self, local_path, items, default_index = 0):
+    def __init__(self, local_path, items, default_index=0):
         super(DefaultComboBox, self).__init__()
         self.local_path = local_path
         self.item_list = items
@@ -116,9 +117,8 @@ class SimpleParamTab(QWidget):
                     if isinstance(widget, QLineEdit):
                         widget.setText(str(value_in))
 
-                    if(
-                        isinstance(widget, QDoubleSpinBox) or
-                        isinstance(widget, QSpinBox)
+                    if isinstance(widget, QDoubleSpinBox) or isinstance(
+                        widget, QSpinBox
                     ):
                         try:
                             widget.setValue(float(value_in))
@@ -142,7 +142,7 @@ class SimpleParamTab(QWidget):
         if self.do_emit:
             self.item_changed.emit(str_path, str_value, 0)
 
-        self.do_emit = True #TODO: find out if this line is needed
+        self.do_emit = True  # TODO: find out if this line is needed
 
     def spnbox_finished(self):
         print("spnbox_finished")
@@ -171,17 +171,15 @@ class SimpleParamTab(QWidget):
 
 
 class ProgBarBox(QProgressDialog):
-    def __init__(self, max_val=100, min_val=0, text="Working", parent = None):
+    def __init__(self, max_val=100, min_val=0, text="Working", parent=None):
         print("ProgBarBox __init__")
 
         if max_val <= min_val:
             raise ValueError("max_val must be larger than min_val")
 
         super(ProgBarBox, self).__init__(
-            labelText=text,
-            minimum=min_val,
-            maximum=max_val,
-            parent=None)
+            labelText=text, minimum=min_val, maximum=max_val, parent=None
+        )
 
         self.setValue(min_val)
         self.setWindowTitle("Import DataSet")
@@ -216,7 +214,6 @@ def iter_tree(my_dict, currentItem, show_hidden, icon_dict):
                 new_item.isdir = False
                 my_icon = icon_dict["File"]
 
-
             new_item.setText(0, new_item_text)
             new_item.setIcon(0, my_icon)
 
@@ -229,11 +226,11 @@ class MyTree(QTreeWidget):
         super(MyTree, self).__init__(parent=parent)
 
     def fillTree(self, lst_dic, show_hidden):
-        DirPixMapi = getattr(QStyle, 'SP_DirIcon')
-        FilePixMapi = getattr(QStyle, 'SP_FileIcon')
+        DirPixMapi = getattr(QStyle, "SP_DirIcon")
+        FilePixMapi = getattr(QStyle, "SP_FileIcon")
         icon_dict = {
-            "Dir":self.style().standardIcon(DirPixMapi),
-            "File":self.style().standardIcon(FilePixMapi)
+            "Dir": self.style().standardIcon(DirPixMapi),
+            "File": self.style().standardIcon(FilePixMapi),
         }
         self.clear()
         iter_tree(lst_dic, self, show_hidden, icon_dict)
@@ -241,14 +238,13 @@ class MyTree(QTreeWidget):
 
 class FileBrowser(QDialog):
     file_or_dir_selected = Signal(str, bool)
+
     def __init__(self, parent=None):
         super(FileBrowser, self).__init__(parent)
 
         self.setWindowTitle("Open IMGs")
 
-        self.my_bar = ProgBarBox(
-            min_val = 0, max_val = 10, text = "loading dir tree"
-        )
+        self.my_bar = ProgBarBox(min_val=0, max_val=10, text="loading dir tree")
         self.my_bar(1)
 
         self.t_view = MyTree()
@@ -279,15 +275,13 @@ class FileBrowser(QDialog):
         self.cancel_butt.clicked.connect(self.cancel_opn)
 
         self.setLayout(mainLayout)
-        cmd = {"nod_lst":[""], "cmd_lst":["dir_tree"]}
+        cmd = {"nod_lst": [""], "cmd_lst": ["dir_tree"]}
         self.my_bar(3)
 
         data_init = ini_data()
         uni_url = data_init.get_url()
 
-        req_get = requests.get(
-            uni_url, stream = True, params = cmd
-        )
+        req_get = requests.get(uni_url, stream=True, params=cmd)
         compresed = req_get.content
         dic_str = zlib.decompress(compresed)
         self.dir_tree_dict = json.loads(dic_str)
@@ -298,7 +292,7 @@ class FileBrowser(QDialog):
         self.my_bar.ended()
         self.show()
 
-    def redraw_dir(self, dummy = None):
+    def redraw_dir(self, dummy=None):
         self.last_file_clicked = None
         self.dir_selected = None
         show_hidden = self.show_hidden_check.isChecked()
@@ -311,12 +305,12 @@ class FileBrowser(QDialog):
 
         else:
             print(
-                "\n set_selection:", self.last_file_clicked,
-                "\n dir_selected:", self.dir_selected
+                "\n set_selection:",
+                self.last_file_clicked,
+                "\n dir_selected:",
+                self.dir_selected,
             )
-            self.file_or_dir_selected.emit(
-                self.last_file_clicked, self.dir_selected
-            )
+            self.file_or_dir_selected.emit(self.last_file_clicked, self.dir_selected)
             self.close()
 
     def node_clicked(self, it_index):
@@ -347,6 +341,7 @@ class FileBrowser(QDialog):
 
 class LocalFileBrowser(QDialog):
     file_or_dir_selected = Signal(str, bool)
+
     def __init__(self, parent=None):
         super(LocalFileBrowser, self).__init__(parent)
 
@@ -356,8 +351,8 @@ class LocalFileBrowser(QDialog):
 
         self.fil_sys_mod = QFileSystemModel()
         self.fil_sys_mod.setRootPath(QDir.homePath())
-        self.t_view =  QTreeView()
-        #print("dir(self.t_view) =", dir(self.t_view))
+        self.t_view = QTreeView()
+        # print("dir(self.t_view) =", dir(self.t_view))
         self.t_view.setModel(self.fil_sys_mod)
         self.t_view.setSortingEnabled(True)
 
@@ -419,13 +414,12 @@ class LocalFileBrowser(QDialog):
             print("select file first")
 
         else:
-            self.file_or_dir_selected.emit(
-                self.last_file_clicked, self.dir_selected
-            )
+            self.file_or_dir_selected.emit(self.last_file_clicked, self.dir_selected)
             self.close()
 
     def cancel_opn(self):
         self.close()
+
 
 def build_template(str_path_in):
     print("\ntime to build template from:\n", str_path_in)
@@ -442,19 +436,22 @@ def build_template(str_path_in):
             found_a_digit = False
 
     for pos in range(last_digit_pos, 0, -1):
-        if str_path_in[pos:pos + 1] not in "0123456789":
+        if str_path_in[pos : pos + 1] not in "0123456789":
             begin_digit_pos = pos
             break
 
-    template_str = str_path_in[0:begin_digit_pos + 1] + "#" * (
-        last_digit_pos - begin_digit_pos
-    ) + str_path_in[last_digit_pos + 1:]
+    template_str = (
+        str_path_in[0 : begin_digit_pos + 1]
+        + "#" * (last_digit_pos - begin_digit_pos)
+        + str_path_in[last_digit_pos + 1 :]
+    )
 
-    star_str = str_path_in[
-        0:begin_digit_pos + 1
-    ] + "*" + str_path_in[last_digit_pos + 1:]
+    star_str = (
+        str_path_in[0 : begin_digit_pos + 1] + "*" + str_path_in[last_digit_pos + 1 :]
+    )
 
     return template_str, star_str
+
 
 def get_lst_par_from_str(str_in):
     lst_com = str_in.split(" ")
@@ -466,16 +463,15 @@ def get_lst_par_from_str(str_in):
 
     return lst_pair
 
+
 class RootWidg(QWidget):
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(RootWidg, self).__init__(parent)
         sys_font = QFont()
         font_point_size = sys_font.pointSize()
 
         big_label = QLabel("Root:")
-        big_label.setFont(
-            QFont("Monospace", font_point_size + 3, QFont.Bold)
-        )
+        big_label.setFont(QFont("Monospace", font_point_size + 3, QFont.Bold))
         self.main_vbox = QVBoxLayout()
         self.main_vbox.addWidget(
             QLabel("Nothing to do here ... \npress the Import button to start")
@@ -496,29 +492,26 @@ class RootWidg(QWidget):
 
 
 class ImportWidget(QWidget):
-    '''
-        This widget behaves differently from mos of the other  << simple >>
-        parameter widgets, every time the user changes a parameter DUI should
-        refresh all parameter since there are some parameter that exclude others
-    '''
+    """
+    This widget behaves differently from mos of the other  << simple >>
+    parameter widgets, every time the user changes a parameter DUI should
+    refresh all parameter since there are some parameter that exclude others
+    """
+
     all_items_changed = Signal(list)
-    def __init__(self, parent = None):
+
+    def __init__(self, parent=None):
         super(ImportWidget, self).__init__(parent)
         self.do_emit = True
         self.dir_selected = None
         sys_font = QFont()
         font_point_size = sys_font.pointSize()
 
-
         self.state_label = QLabel("   ...")
-        self.state_label.setFont(
-            QFont("Monospace", font_point_size + 1, QFont.Bold)
-        )
+        self.state_label.setFont(QFont("Monospace", font_point_size + 1, QFont.Bold))
         self.imp_txt = QLineEdit()
         self.extra_label = QLabel("   ...")
-        self.extra_label.setFont(
-            QFont("Monospace", font_point_size + 1, QFont.Bold)
-        )
+        self.extra_label.setFont(QFont("Monospace", font_point_size + 1, QFont.Bold))
         self.imp_extra_txt = QLineEdit()
         self.open_butt = QPushButton("  Open Images  ")
 
@@ -624,19 +617,16 @@ class ImportWidget(QWidget):
         self.imp_extra_txt.setText(new_par_str)
 
     def update_all_pars(self, tup_lst_pars):
-        print(
-            "<< update_all_pars(ImportWidget) >>",
-            tup_lst_pars
-        )
+        print("<< update_all_pars(ImportWidget) >>", tup_lst_pars)
 
         for n, par in enumerate(tup_lst_pars):
             print("n=", n, "par=", par)
 
         try:
             for par_dic in tup_lst_pars[0]:
-                if(
-                    par_dic["name"] == "input.directory" or
-                    par_dic["name"] == "input.template"
+                if (
+                    par_dic["name"] == "input.directory"
+                    or par_dic["name"] == "input.template"
                 ):
                     if par_dic["name"] == "input.directory":
                         self.dir_selected = True
@@ -652,24 +642,21 @@ class ImportWidget(QWidget):
             self.state_label.setText("   ...")
 
     def update_param(self, str_path, str_value):
-        print(
-            "update_param(ImportWidget)",
-            str_path, str_value, "... dummy"
-        )
+        print("update_param(ImportWidget)", str_path, str_value, "... dummy")
+
 
 class MaskWidget(QWidget):
     all_items_changed = Signal(list)
     component_changed = Signal(str)
-    def __init__(self, parent = None):
+
+    def __init__(self, parent=None):
         super(MaskWidget, self).__init__(parent)
         self.do_emit = True
         sys_font = QFont()
         font_point_size = sys_font.pointSize()
 
         self.cmd_label = QLabel("")
-        self.cmd_label.setFont(QFont(
-            "Monospace", font_point_size -1, QFont.Bold
-        ))
+        self.cmd_label.setFont(QFont("Monospace", font_point_size - 1, QFont.Bold))
 
         self.main_vbox = QVBoxLayout()
 
@@ -737,16 +724,26 @@ class MaskWidget(QWidget):
         if comp_dict["type"] == "rect":
             inner_lst_pair = [
                 "untrusted.rectangle",
-                str(comp_dict["x_ini"]) + "," + str(comp_dict["x_end"]) + "," +
-                str(comp_dict["y_ini"]) + "," + str(comp_dict["y_end"]) + ","
+                str(comp_dict["x_ini"])
+                + ","
+                + str(comp_dict["x_end"])
+                + ","
+                + str(comp_dict["y_ini"])
+                + ","
+                + str(comp_dict["y_end"])
+                + ",",
             ]
             self.comp_list.append(inner_lst_pair)
 
         elif comp_dict["type"] == "circ":
             inner_lst_pair = [
                 "untrusted.circle",
-                str(comp_dict["x_c"]) + "," + str(comp_dict["y_c"]) + "," +
-                str(comp_dict["r"]) + "," ,
+                str(comp_dict["x_c"])
+                + ","
+                + str(comp_dict["y_c"])
+                + ","
+                + str(comp_dict["r"])
+                + ",",
             ]
             self.comp_list.append(inner_lst_pair)
 
@@ -754,7 +751,7 @@ class MaskWidget(QWidget):
             if self.comp_list == [] or self.comp_list[-1][0] != "untrusted.polygon":
                 inner_lst_pair = [
                     "untrusted.polygon",
-                    str(comp_dict["x_end"]) + "," + str(comp_dict["y_end"]) + ","
+                    str(comp_dict["x_end"]) + "," + str(comp_dict["y_end"]) + ",",
                 ]
                 self.comp_list.append(inner_lst_pair)
 
@@ -769,12 +766,7 @@ class MaskWidget(QWidget):
         first_list.append(["output.mask", "tmp_mask.pickle"])
         print("first_list =", first_list, "\n")
 
-        full_list = [
-            first_list,
-            [
-                ["input.mask", "tmp_mask.pickle"]
-            ]
-        ]
+        full_list = [first_list, [["input.mask", "tmp_mask.pickle"]]]
         return full_list
 
     def comp_list_update(self):
@@ -791,7 +783,8 @@ class FindspotsSimplerParameterTab(SimpleParamTab):
     in the spot-finder, this widget is the first to appear once the button
     "Find Sots" is clicked
     """
-    def __init__(self, parent=None, add_rad_prof = False):
+
+    def __init__(self, parent=None, add_rad_prof=False):
         super(FindspotsSimplerParameterTab, self).__init__()
         self.do_emit = True
         self.add_rad_prof = add_rad_prof
@@ -881,84 +874,56 @@ class FindspotsSimplerParameterTab(SimpleParamTab):
         print("set_d_max_changed(Spotfinding)", stat)
         if int(stat) == 2:
             print("time to add << Set d_max=20 >>")
-            self.do_emit_signal(
-                "spotfinder.filter.d_max", "20"
-            )
+            self.do_emit_signal("spotfinder.filter.d_max", "20")
 
         else:
             print("time to remove << Set d_max=20 >>")
-            self.do_emit_signal(
-                "spotfinder.filter.d_max", "None"
-            )
+            self.do_emit_signal("spotfinder.filter.d_max", "None")
 
     def set_d_min_changed(self, stat):
         print("set_d_min_changed(Spotfinding)", stat)
         if int(stat) == 2:
             print("time to add << Set d_min=2.5 >>")
-            self.do_emit_signal(
-                "spotfinder.filter.d_min", "2.5"
-            )
+            self.do_emit_signal("spotfinder.filter.d_min", "2.5")
 
         else:
             print("time to remove << Set d_min=2.5 >>")
-            self.do_emit_signal(
-                "spotfinder.filter.d_min", "None"
-            )
+            self.do_emit_signal("spotfinder.filter.d_min", "None")
 
     def set_alg_changed(self, stat):
         print("set_alg_changed(Spotfinding)", stat)
         if int(stat) == 2:
             print("time to add << Set algorithm=radial_profile >>")
-            self.do_emit_signal(
-                "spotfinder.threshold.algorithm", "radial_profile"
-            )
+            self.do_emit_signal("spotfinder.threshold.algorithm", "radial_profile")
 
         else:
             print("time to remove << Set algorithm=radial_profile >>")
-            self.do_emit_signal(
-                "spotfinder.threshold.algorithm", "dispersion_extended"
-            )
+            self.do_emit_signal("spotfinder.threshold.algorithm", "dispersion_extended")
 
-        #time to add: "spotfinder.threshold.algorithm=radial_profile"
-        #default = dispersion_extended
-
+        # time to add: "spotfinder.threshold.algorithm=radial_profile"
+        # default = dispersion_extended
 
     def special_check_up(self, param_in, value_in):
-        print(
-            "special_check_up(Spotfinding): param_in, value_in",
-            param_in, value_in
-        )
-        if(
-            param_in == "spotfinder.filter.d_max"
-            and value_in == "20"
-        ):
+        print("special_check_up(Spotfinding): param_in, value_in", param_in, value_in)
+        if param_in == "spotfinder.filter.d_max" and value_in == "20":
             self.set_d_max.setChecked(True)
 
-        elif(
-            param_in == "spotfinder.filter.d_max"
-            and value_in != "20"
-        ):
+        elif param_in == "spotfinder.filter.d_max" and value_in != "20":
             self.set_d_max.setChecked(False)
 
-        if(
-            param_in == "spotfinder.filter.d_min"
-            and value_in == "2.5"
-        ):
+        if param_in == "spotfinder.filter.d_min" and value_in == "2.5":
             self.set_d_min.setChecked(True)
 
-        elif(
-            param_in == "spotfinder.filter.d_min"
-            and value_in != "2.5"
-        ):
+        elif param_in == "spotfinder.filter.d_min" and value_in != "2.5":
             self.set_d_min.setChecked(False)
 
-        if(
+        if (
             param_in == "spotfinder.threshold.algorithm"
             and value_in == "radial_profile"
         ):
             self.set_rad_pro_alg.setChecked(True)
 
-        elif(
+        elif (
             param_in == "spotfinder.threshold.algorithm"
             and value_in != "radial_profile"
         ):
@@ -971,6 +936,7 @@ class IndexSimplerParamTab(SimpleParamTab):
     in the indexer, this widget is the first to appear once the button
     "Index" is clicked
     """
+
     def __init__(self, phl_obj=None, parent=None):
         super(IndexSimplerParamTab, self).__init__()
         self.do_emit = True
@@ -983,8 +949,10 @@ class IndexSimplerParamTab(SimpleParamTab):
         hbox_method = QHBoxLayout()
         label_method_62 = QLabel("Indexing method")
         hbox_method.addWidget(label_method_62)
-        box_method_62 = DefaultComboBox("indexing.method", ["fft3d", "fft1d",
-            "real_space_grid_search", "low_res_spot_match"])
+        box_method_62 = DefaultComboBox(
+            "indexing.method",
+            ["fft3d", "fft1d", "real_space_grid_search", "low_res_spot_match"],
+        )
         box_method_62.currentIndexChanged.connect(self.combobox_changed)
 
         hbox_method.addWidget(box_method_62)
@@ -1042,28 +1010,25 @@ class IndexSimplerParamTab(SimpleParamTab):
         print("detec_fix_changed(IndexSimplerParamTab)", stat)
         if int(stat) == 2:
             print("time to add << detector.fix=distance >>")
-            self.do_emit_signal(
-                "refinement.parameterisation.detector.fix", "distance"
-            )
+            self.do_emit_signal("refinement.parameterisation.detector.fix", "distance")
 
         else:
             print("time to remove << detector.fix=distance >>")
-            self.do_emit_signal(
-                "refinement.parameterisation.detector.fix", "None"
-            )
+            self.do_emit_signal("refinement.parameterisation.detector.fix", "None")
 
     def special_check_up(self, param_in, value_in):
         print(
             "special_check_up(IndexSimplerParamTab): param_in, value_in",
-            param_in, value_in
+            param_in,
+            value_in,
         )
-        if(
+        if (
             param_in == "refinement.parameterisation.detector.fix"
             and value_in == "distance"
         ):
             self.detec_fix.setChecked(True)
 
-        elif(
+        elif (
             param_in == "refinement.parameterisation.detector.fix"
             and value_in != "distance"
         ):
@@ -1084,8 +1049,10 @@ class RefineBravaiSimplerParamTab(SimpleParamTab):
 
         hbox_lay_outlier_algorithm.addWidget(label_outlier_algorithm)
         box_outlier_algorithm = DefaultComboBox(
-            "refinement.reflections.outlier.algorithm", ["null", "Auto", "mcd",
-            "tukey", "sauter_poon"], default_index=1)
+            "refinement.reflections.outlier.algorithm",
+            ["null", "Auto", "mcd", "tukey", "sauter_poon"],
+            default_index=1,
+        )
 
         self.detec_fix = QCheckBox("Set detector.fix=distance")
 
@@ -1115,28 +1082,25 @@ class RefineBravaiSimplerParamTab(SimpleParamTab):
         print("detec_fix_changed(RefineBravaiSimplerParamTab)", stat)
         if int(stat) == 2:
             print("time to add << detector.fix=distance >>")
-            self.do_emit_signal(
-                "refinement.parameterisation.detector.fix", "distance"
-            )
+            self.do_emit_signal("refinement.parameterisation.detector.fix", "distance")
 
         else:
             print("time to remove << detector.fix=distance >>")
-            self.do_emit_signal(
-                "refinement.parameterisation.detector.fix", "None"
-            )
+            self.do_emit_signal("refinement.parameterisation.detector.fix", "None")
 
     def special_check_up(self, param_in, value_in):
         print(
             "special_check_up(RefineBravaiSimplerParamTab): param_in, value_in",
-            param_in, value_in
+            param_in,
+            value_in,
         )
-        if(
+        if (
             param_in == "refinement.parameterisation.detector.fix"
             and value_in == "distance"
         ):
             self.detec_fix.setChecked(True)
 
-        elif(
+        elif (
             param_in == "refinement.parameterisation.detector.fix"
             and value_in != "distance"
         ):
@@ -1149,6 +1113,7 @@ class RefineSimplerParamTab(SimpleParamTab):
     in the refiner, this widget is the first to appear once the button
     "Refine" is clicked
     """
+
     def __init__(self, parent=None):
         super(RefineSimplerParamTab, self).__init__()
         self.do_emit = True
@@ -1162,8 +1127,11 @@ class RefineSimplerParamTab(SimpleParamTab):
         label_scan_varying = QLabel("Scan varying refinement")
         hbox_lay_scan_varying.addWidget(label_scan_varying)
 
-        box_scan_varying = DefaultComboBox("refinement.parameterisation.scan_varying",
-            ["True", "False", "Auto"], default_index=2)
+        box_scan_varying = DefaultComboBox(
+            "refinement.parameterisation.scan_varying",
+            ["True", "False", "Auto"],
+            default_index=2,
+        )
         box_scan_varying.currentIndexChanged.connect(self.combobox_changed)
         hbox_lay_scan_varying.addWidget(box_scan_varying)
         self.main_v_layout.addLayout(hbox_lay_scan_varying)
@@ -1173,8 +1141,10 @@ class RefineSimplerParamTab(SimpleParamTab):
 
         hbox_lay_outlier_algorithm.addWidget(label_outlier_algorithm)
         box_outlier_algorithm = DefaultComboBox(
-            "refinement.reflections.outlier.algorithm", ["null", "Auto", "mcd",
-            "tukey", "sauter_poon"], default_index=1)
+            "refinement.reflections.outlier.algorithm",
+            ["null", "Auto", "mcd", "tukey", "sauter_poon"],
+            default_index=1,
+        )
         box_outlier_algorithm.currentIndexChanged.connect(self.combobox_changed)
 
         hbox_lay_outlier_algorithm.addWidget(box_outlier_algorithm)
@@ -1206,28 +1176,25 @@ class RefineSimplerParamTab(SimpleParamTab):
         print("detec_fix_changed(RefineSimplerParamTab)", stat)
         if int(stat) == 2:
             print("time to add << detector.fix=distance >>")
-            self.do_emit_signal(
-                "refinement.parameterisation.detector.fix", "distance"
-            )
+            self.do_emit_signal("refinement.parameterisation.detector.fix", "distance")
 
         else:
             print("time to remove << detector.fix=distance >>")
-            self.do_emit_signal(
-                "refinement.parameterisation.detector.fix", "None"
-            )
+            self.do_emit_signal("refinement.parameterisation.detector.fix", "None")
 
     def special_check_up(self, param_in, value_in):
         print(
             "special_check_up(RefineSimplerParamTab): param_in, value_in",
-            param_in, value_in
+            param_in,
+            value_in,
         )
-        if(
+        if (
             param_in == "refinement.parameterisation.detector.fix"
             and value_in == "distance"
         ):
             self.detec_fix.setChecked(True)
 
-        elif(
+        elif (
             param_in == "refinement.parameterisation.detector.fix"
             and value_in != "distance"
         ):
@@ -1240,6 +1207,7 @@ class IntegrateSimplerParamTab(SimpleParamTab):
     in the integrate algorithm, this widget is the first to appear once the
     button "Integrate" is clicked
     """
+
     def __init__(self, parent=None):
         super(IntegrateSimplerParamTab, self).__init__()
         self.do_emit = True
@@ -1253,8 +1221,9 @@ class IntegrateSimplerParamTab(SimpleParamTab):
         label_PrFit = QLabel("Use profile fitting")
         PrFit_lay_out.addWidget(label_PrFit)
 
-        PrFit_comb_bx = DefaultComboBox("integration.profile.fitting",
-            ["True", "False", "Auto"])
+        PrFit_comb_bx = DefaultComboBox(
+            "integration.profile.fitting", ["True", "False", "Auto"]
+        )
         PrFit_comb_bx.currentIndexChanged.connect(self.combobox_changed)
 
         PrFit_lay_out.addWidget(PrFit_comb_bx)
@@ -1264,8 +1233,11 @@ class IntegrateSimplerParamTab(SimpleParamTab):
         label_algorithm_53 = QLabel("Background algorithm")
         hbox_lay_algorithm_53.addWidget(label_algorithm_53)
 
-        box_algorithm_53 = DefaultComboBox("integration.background.algorithm",
-            ["simple", "null", "median", "gmodel", "glm"], default_index=4)
+        box_algorithm_53 = DefaultComboBox(
+            "integration.background.algorithm",
+            ["simple", "null", "median", "gmodel", "glm"],
+            default_index=4,
+        )
         box_algorithm_53.currentIndexChanged.connect(self.combobox_changed)
 
         hbox_lay_algorithm_53.addWidget(box_algorithm_53)
@@ -1283,14 +1255,13 @@ class IntegrateSimplerParamTab(SimpleParamTab):
         self.main_v_layout.addLayout(hbox_d_min)
 
         self.main_v_layout.addStretch()
-        #self.box_nproc.item_list = None
-        self.lst_var_widg = _get_all_direct_layout_widget_children(
-            self.main_v_layout
-        )
+        # self.box_nproc.item_list = None
+        self.lst_var_widg = _get_all_direct_layout_widget_children(self.main_v_layout)
 
     def reset_pars(self):
         self.clearLayout(self.main_v_layout)
         self.build_pars()
+
 
 class SymmetrySimplerParamTab(SimpleParamTab):
     """
@@ -1298,6 +1269,7 @@ class SymmetrySimplerParamTab(SimpleParamTab):
     in the symmetry command, this widget is the first to appear once the button
     "Symmetry" is clicked
     """
+
     def __init__(self, parent=None):
         super(SymmetrySimplerParamTab, self).__init__()
         self.do_emit = True
@@ -1336,6 +1308,7 @@ class ScaleSimplerParamTab(SimpleParamTab):
     in the scale command, this widget is the first to appear once the button
     "Scale" is clicked
     """
+
     def __init__(self, parent=None):
         super(ScaleSimplerParamTab, self).__init__()
         self.do_emit = True
@@ -1345,7 +1318,7 @@ class ScaleSimplerParamTab(SimpleParamTab):
 
     def build_pars(self):
 
-        #TODO: review the parameters here, they need updating
+        # TODO: review the parameters here, they need updating
 
         hbox_lay_mod = QHBoxLayout()
         label_mod = QLabel("Model")
@@ -1359,8 +1332,9 @@ class ScaleSimplerParamTab(SimpleParamTab):
         label_wgh_opt_err = QLabel("Error optimisation model")
 
         hbox_lay_wgh_opt_err.addWidget(label_wgh_opt_err)
-        box_wgh_opt_err = DefaultComboBox("weighting.error_model.error_model",
-            ["basic", "None"])
+        box_wgh_opt_err = DefaultComboBox(
+            "weighting.error_model.error_model", ["basic", "None"]
+        )
         box_wgh_opt_err.currentIndexChanged.connect(self.combobox_changed)
         hbox_lay_wgh_opt_err.addWidget(box_wgh_opt_err)
 
@@ -1407,9 +1381,10 @@ class CombineExperimentSimplerParamTab(SimpleParamTab):
 
         hbox_lay_dummy_1.addWidget(label_dummy_1)
         box_dummy_2 = DefaultComboBox(
-            "scope_1.scope_2.definition", [
-                "opt 1", "opt 2", "None", "Auto"
-            ], default_index=1)
+            "scope_1.scope_2.definition",
+            ["opt 1", "opt 2", "None", "Auto"],
+            default_index=1,
+        )
         box_dummy_2.currentIndexChanged.connect(self.combobox_changed)
         hbox_lay_dummy_1.addWidget(box_dummy_2)
         self.main_v_layout.addLayout(hbox_lay_dummy_1)
@@ -1428,7 +1403,8 @@ class CombineExperimentSimplerParamTab(SimpleParamTab):
 class OptionalWidget(SimpleParamTab):
     all_items_changed = Signal(list)
     main_command_changed = Signal(str)
-    def __init__(self, parent = None, cmd_lst = None):
+
+    def __init__(self, parent=None, cmd_lst=None):
         super(OptionalWidget, self).__init__(parent)
         cmd_men_lst = ["..."]
         for single_command in cmd_lst:
@@ -1463,10 +1439,7 @@ class OptionalWidget(SimpleParamTab):
         self.par_imp_txt.setText("")
 
     def update_all_pars(self, tup_lst_pars):
-        print(
-            "update_all_pars(ImportWidget)",
-            tup_lst_pars
-        )
+        print("update_all_pars(ImportWidget)", tup_lst_pars)
 
     def param_line_changed(self):
         str_full_line = self.par_imp_txt.text()
@@ -1494,21 +1467,21 @@ class OptionalWidget(SimpleParamTab):
 
 
 class ExportWidget(QWidget):
-    '''
-        This widget is a simplified version of ImportWidget since
-        there is no need interact with a remote << FileBrowser >>
-    '''
+    """
+    This widget is a simplified version of ImportWidget since
+    there is no need interact with a remote << FileBrowser >>
+    """
+
     all_items_changed = Signal(list)
     find_scaled_before = Signal()
-    def __init__(self, parent = None):
+
+    def __init__(self, parent=None):
         super(ExportWidget, self).__init__(parent)
         sys_font = QFont()
         font_point_size = sys_font.pointSize()
 
         state_label = QLabel("mtz output name:")
-        state_label.setFont(
-            QFont("Monospace", font_point_size + 1, QFont.Bold)
-        )
+        state_label.setFont(QFont("Monospace", font_point_size + 1, QFont.Bold))
 
         self.exp_txt = QLineEdit()
         self.exp_txt.textChanged.connect(self.line_changed)
@@ -1538,7 +1511,6 @@ class ExportWidget(QWidget):
     def set_ed_pars(self):
         print("set_ed_pars(SimpleParamTab)")
 
-
     def is_scale_parent(self, scale_in_parents):
         if scale_in_parents:
             self.exp_txt.setText("scaled.mtz")
@@ -1549,10 +1521,7 @@ class ExportWidget(QWidget):
         self.line_changed()
 
     def update_all_pars(self, tup_lst_pars):
-        print(
-            "update_all_pars(ExportWidget)",
-            tup_lst_pars
-        )
+        print("update_all_pars(ExportWidget)", tup_lst_pars)
         try:
             inp_val = str(tup_lst_pars[0][0]["value"])
             print("inp_val =", inp_val)
@@ -1562,7 +1531,7 @@ class ExportWidget(QWidget):
             print(" Not copying parameters from node (Index err catch )")
             self.exp_txt.setText("")
 
-    def set_download_stat(self, do_enable = False, nod_num = None):
+    def set_download_stat(self, do_enable=False, nod_num=None):
         self.setEnabled(True)
         self.exp_txt.setEnabled(not do_enable)
         self.downl_but.setEnabled(do_enable)
@@ -1574,12 +1543,12 @@ class ExportWidget(QWidget):
             self, "Download MTZ File", ini_file, "Intensity  (*.mtz)"
         )
         self.file_name = fileResul[0]
-        if self.file_name != '':
+        if self.file_name != "":
             self.progress_label.setText("Requesting mtz file ...")
 
             data_init = ini_data()
             uni_url = data_init.get_url()
-            cmd = {"nod_lst":[self.cur_nod_num], "cmd_lst":["get_mtz"]}
+            cmd = {"nod_lst": [self.cur_nod_num], "cmd_lst": ["get_mtz"]}
             self.dowl_thrd = Mtz_Data_Request(uni_url, cmd)
             self.dowl_thrd.update_progress.connect(self.show_new_progress)
             self.dowl_thrd.done_download.connect(self.save_mtz_on_disc)
@@ -1590,9 +1559,7 @@ class ExportWidget(QWidget):
             print("Canceled Operation")
 
     def show_new_progress(self, new_prog):
-        self.progress_label.setText(
-            str("Downloading: " + str(new_prog) + " %")
-        )
+        self.progress_label.setText(str("Downloading: " + str(new_prog) + " %"))
 
     def save_mtz_on_disc(self, mtz_info):
         self.progress_label.setText("...")
@@ -1611,16 +1578,16 @@ class TmpTstWidget(QWidget):
         super(TmpTstWidget, self).__init__()
         self.do_emit = True
 
-        #my_widget = MaskWidget(self)
+        # my_widget = MaskWidget(self)
         my_widget = ImportWidget(self)
-        #my_widget = FindspotsSimplerParameterTab(self)
-        #my_widget = IndexSimplerParamTab(self)
-        #my_widget = RefineBravaiSimplerParamTab(self)
-        #my_widget = RefineSimplerParamTab(self)
-        #my_widget = IntegrateSimplerParamTab(self)
-        #my_widget = SymmetrySimplerParamTab(self)
-        #my_widget = ScaleSimplerParamTab(self)
-        #my_widget = CombineExperimentSimplerParamTab(self)
+        # my_widget = FindspotsSimplerParameterTab(self)
+        # my_widget = IndexSimplerParamTab(self)
+        # my_widget = RefineBravaiSimplerParamTab(self)
+        # my_widget = RefineSimplerParamTab(self)
+        # my_widget = IntegrateSimplerParamTab(self)
+        # my_widget = SymmetrySimplerParamTab(self)
+        # my_widget = ScaleSimplerParamTab(self)
+        # my_widget = CombineExperimentSimplerParamTab(self)
 
         my_box = QVBoxLayout()
         my_box.addWidget(my_widget)

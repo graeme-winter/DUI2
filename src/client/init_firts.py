@@ -1,16 +1,17 @@
-#uni_url = 'None'
+# uni_url = 'None'
 
 import os, sys
 from shared_modules import format_utils
+
 
 class ini_data(object):
     def __init__(self):
         print("ini_data.__init__()")
 
-    def set_data(self, par_def = None):
+    def set_data(self, par_def=None):
         if par_def == None:
             par_def = (
-                ("url", 'http://localhost:45678/'),
+                ("url", "http://localhost:45678/"),
                 ("all_local", "False"),
                 ("windows_exe", "False"),
             )
@@ -20,10 +21,7 @@ class ini_data(object):
         print("init_param =", init_param)
         global uni_url
         uni_url = init_param["url"]
-        print(
-            "\n init_param['all_local'] =",
-            init_param["all_local"], "\n"
-        )
+        print("\n init_param['all_local'] =", init_param["all_local"], "\n")
         global run_local
         if init_param["all_local"].lower() == "true":
             run_local = True
@@ -41,6 +39,7 @@ class ini_data(object):
             win_exe = False
 
         print("\n win_exe =", win_exe, "\n")
+
     def set_tmp_dir(self, dir_path_in):
         global tmp_dir
         tmp_dir = dir_path_in
@@ -61,4 +60,3 @@ class ini_data(object):
 if __name__ == "__main__":
     init_firts = ini_data()
     print("ini_data.uni_url =", init_firts.get_url())
-
