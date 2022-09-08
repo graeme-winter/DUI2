@@ -13,7 +13,6 @@ from server import run_server
 from client import run_client
 
 
-
 server_par_def = (
     ("init_path", None),
     ("port", 45678),
