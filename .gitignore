@@ -1,0 +1,14 @@
+# Compiled Python files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Temporary files
+.cache
+.pytest_cache
+
+# Python packaging
+/dist
+/dials.egg-info
+/src/dials.egg-info
+
